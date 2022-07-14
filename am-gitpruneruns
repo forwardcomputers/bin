@@ -35,7 +35,7 @@ do_git_action() {
 usage() {
   cat <<_EOF
 
-GitHub prune workflow runs ${_VERSION} (https://github.com/forwardcomputers/bin/am-gitpruneruns)
+GitHub prune workflow runs ${_VERSION} (https://github.com/forwardcomputers/bin/raw/main/am-gitpruneruns)
 Released under CC0, with no warranty and no liability. Use on your own risk.
 
 Usage: ${_SCRIPT_NAME} [Options] Repository
