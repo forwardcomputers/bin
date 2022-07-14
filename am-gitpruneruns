@@ -22,13 +22,13 @@ do_git_action() {
   _EXTRA="${_EXTRA-};${2}"
   _PAGES=$( curl -sI -H "${_HEAD}" -H "${_AUTH}" "${_BASE_URL}/${_ACTION}?per_page=100${_EXTRA}" | awk '/^link/ { gsub(/^link:.*page=/,""); gsub(/>.*$/,""); print }' )
   _PAGES=${_PAGES:-1}
-  _PAGE=1; while [ $_PAGE -le $_PAGES ]; do
+  _PAGE=1; while [ $_PAGE -le "${_PAGES}" ]; do
     _URL="${_BASE_URL}/${_ACTION}?page=${_PAGE};per_page=100${_EXTRA}"
     for _ID in $( curl -sL -H "${_HEAD}" -H "${_AUTH}" "${_URL}" | jq -r .workflow_runs[].id ); do
       echo "Working on - $_ID"
       # curl -sL -H "${_HEAD}" -H "${_AUTH}" -X DELETE "${_BASE_URL}/${_ACTION}/$_ID"
     done
-    _PAGE=$(( $_PAGE + 1 ))
+    _PAGE=$(( _PAGE + 1 ))
   done
 }
 #
@@ -69,8 +69,8 @@ msg() {
 }
 #
 die() {
-  local msg="${1}"
-  local code="${2-1}" # default exit status 1
+  msg="${1}"
+  code="${2-1}" # default exit status 1
   msg "$msg"
   usage
   exit "$code"
