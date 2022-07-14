@@ -11,7 +11,8 @@ _OWNER="forwardcomputers/"
 _DAYS=30
 _TOKEN="$LP_GITHUB_API_TOKEN"
 #
-_VERSION=0.1.0
+_VERSION=0.1.1
+_SCRIPT_URL="https://github.com/forwardcomputers/bin/raw/main/am-gitpruneruns"
 _SCRIPT_NAME=$( basename "${0}")
 _HEAD="Accept: application/vnd.github+json"
 _AUTH="Authorization: token $_TOKEN"
@@ -25,8 +26,8 @@ do_git_action() {
   _PAGE=1; while [ $_PAGE -le "${_PAGES}" ]; do
     _URL="${_BASE_URL}/${_ACTION}?page=${_PAGE};per_page=100${_EXTRA}"
     for _ID in $( curl -sL -H "${_HEAD}" -H "${_AUTH}" "${_URL}" | jq -r .workflow_runs[].id ); do
-      echo "Working on - $_ID"
-      # curl -sL -H "${_HEAD}" -H "${_AUTH}" -X DELETE "${_BASE_URL}/${_ACTION}/$_ID"
+      printf '%b\n' "${_DRY_RUN:-(Dry run) }Pruning run id: $_ID"
+      ${_FORCE-false} && curl -sL -H "${_HEAD}" -H "${_AUTH}" -X DELETE "${_BASE_URL}/${_ACTION}/$_ID"
     done
     _PAGE=$(( _PAGE + 1 ))
   done
@@ -35,7 +36,7 @@ do_git_action() {
 usage() {
   cat <<_EOF
 
-GitHub prune workflow runs ${_VERSION} (https://github.com/forwardcomputers/bin/raw/main/am-gitpruneruns)
+GitHub prune workflow runs v${_VERSION} (${_SCRIPT_URL})
 Released under CC0, with no warranty and no liability. Use on your own risk.
 
 Usage: ${_SCRIPT_NAME} [Options] Repository
@@ -48,6 +49,7 @@ Options:
     --completed       Completed runs only
 -d, --days <number>   Days to keep (default 30 days)
     --failure         Failed runs only
+-f, --force           Force pruning (Dry run normally)
 -h, --help            Print this help and exit
 -s, --since <string>  Keep since yyyy-mm-dd
     --skipped         Skipped runs only
@@ -65,7 +67,6 @@ cleanup() {
 #
 msg() {
   printf '\n%b\n' >&2 "${1-}"
-  # echo >&2 -e "${1-}"
 }
 #
 die() {
@@ -79,12 +80,13 @@ die() {
 parse_params() {
   while [ "$#" -ne 0 ]; do
     case "${1-}" in
-      -h | --help     ) usage ;;
-      -d | --days     ) _SINCE=$( date --date="${2-} days ago" +%Y-%m-%d ); shift ;;
-      -s | --since    ) _SINCE=$( date --date="${2-}" +%Y-%m-%d ); shift ;;
       --cancelled     ) _EXTRA=";status=${1#--}" ;;
       --completed     ) _EXTRA=";status=${1#--}" ;;
+      -d | --days     ) _SINCE=$( date --date="${2-} days ago" +%Y-%m-%d ); shift ;;
       --failure       ) _EXTRA=";status=${1#--}" ;;
+      -f | --force    ) _FORCE=true; _DRY_RUN="" ;;
+      -h | --help     ) usage ;;
+      -s | --since    ) _SINCE=$( date --date="${2-}" +%Y-%m-%d ); shift ;;
       --skipped       ) _EXTRA=";status=${1#--}" ;;
       --success       ) _EXTRA=";status=${1#--}" ;;
       -v | --verbose  ) set -x ;;
