@@ -1,0 +1,109 @@
+#!/bin/sh
+set -eu
+# Bash only - set -o pipefail
+trap cleanup EXIT
+#
+# Script to prune old workflow runs for given repository
+#
+# Note - GitHub Search API provides up to 1,000 results for each search run
+#
+_OWNER="forwardcomputers/"
+_DAYS=30
+_TOKEN="$LP_GITHUB_API_TOKEN"
+#
+_VERSION=0.1.0
+_SCRIPT_NAME=$( basename "${0}")
+_HEAD="Accept: application/vnd.github+json"
+_AUTH="Authorization: token $_TOKEN"
+[ -n "${_DAYS+x}" ] && _SINCE=$( date --date="${_DAYS:-30} days ago" +%Y-%m-%d ) || _SINCE=$( date --date="30 days ago" +%Y-%m-%d )
+#
+do_git_action() {
+  _ACTION="${1}"
+  _EXTRA="${_EXTRA-};${2}"
+  _PAGES=$( curl -sI -H "${_HEAD}" -H "${_AUTH}" "${_BASE_URL}/${_ACTION}?per_page=100${_EXTRA}" | awk '/^link/ { gsub(/^link:.*page=/,""); gsub(/>.*$/,""); print }' )
+  _PAGES=${_PAGES:-1}
+  _PAGE=1; while [ $_PAGE -le $_PAGES ]; do
+    _URL="${_BASE_URL}/${_ACTION}?page=${_PAGE};per_page=100${_EXTRA}"
+    for _ID in $( curl -sL -H "${_HEAD}" -H "${_AUTH}" "${_URL}" | jq -r .workflow_runs[].id ); do
+      echo "Working on - $_ID"
+      # curl -sL -H "${_HEAD}" -H "${_AUTH}" -X DELETE "${_BASE_URL}/${_ACTION}/$_ID"
+    done
+    _PAGE=$(( $_PAGE + 1 ))
+  done
+}
+#
+usage() {
+  cat <<_EOF
+
+GitHub prune workflow runs ${_VERSION} (https://github.com/forwardcomputers/bin/am-gitpruneruns)
+Released under CC0, with no warranty and no liability. Use on your own risk.
+
+Usage: ${_SCRIPT_NAME} [Options] Repository
+
+Script to prune old workflow runs for given repository
+
+Options:
+
+    --cancelled       Cancelled runs only
+    --completed       Completed runs only
+-d, --days <number>   Days to keep (default 30 days)
+    --failure         Failed runs only
+-h, --help            Print this help and exit
+-s, --since <string>  Keep since yyyy-mm-dd
+    --skipped         Skipped runs only
+    --success         Successful runs only
+-v, --verbose         Make the operation more talkative
+
+_EOF
+  exit
+}
+#
+cleanup() {
+  [ $? -eq 0 ] && exit
+  die "Missing parameter"
+}
+#
+msg() {
+  printf '\n%b\n' >&2 "${1-}"
+  # echo >&2 -e "${1-}"
+}
+#
+die() {
+  local msg="${1}"
+  local code="${2-1}" # default exit status 1
+  msg "$msg"
+  usage
+  exit "$code"
+}
+#
+parse_params() {
+  while [ "$#" -ne 0 ]; do
+    case "${1-}" in
+      -h | --help     ) usage ;;
+      -d | --days     ) _SINCE=$( date --date="${2-} days ago" +%Y-%m-%d ); shift ;;
+      -s | --since    ) _SINCE=$( date --date="${2-}" +%Y-%m-%d ); shift ;;
+      --cancelled     ) _EXTRA=";status=${1#--}" ;;
+      --completed     ) _EXTRA=";status=${1#--}" ;;
+      --failure       ) _EXTRA=";status=${1#--}" ;;
+      --skipped       ) _EXTRA=";status=${1#--}" ;;
+      --success       ) _EXTRA=";status=${1#--}" ;;
+      -v | --verbose  ) set -x ;;
+      -?*             ) die "Unknown option: $1" ;;
+      *               ) _REPO=$1 ;;
+    esac
+    shift > /dev/null 2>&1
+  done
+
+  [ -z "${_REPO-}" ] && die "Missing Repository"
+  [ -z "${_SINCE-}" ] && die "Missing Date parameter"
+  
+  return 0
+}
+#
+parse_params "$@"
+#
+echo "${_REPO}" | grep -q "/" || _REPO="${_OWNER-}${_REPO}"
+echo "${_REPO}" | grep -q "/" || die "Missing Repository owner"
+_BASE_URL="https://api.github.com/repos/${_REPO}"
+do_git_action "actions/runs" "created=<$_SINCE"
+#
