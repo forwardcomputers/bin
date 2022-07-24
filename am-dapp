@@ -311,9 +311,11 @@ build () { ## Build docker image file
 }
 #
 push () {  ## Push image to Docker Hub
-  printf '%s\n' "Pushing ${NAME}-${APPNEW} to Docker hub"
-  docker image push "${IMG}":latest
-  docker image push "${IMG}":"${APPNEW}"
+  if [ ! $(perl -nle 'print $& if /(?<=^#PLATFORM ).*/' "${ROOT}${NAME}"/Dockerfile ) ]; then
+    printf '%s\n' "Pushing ${NAME}-${APPNEW} to Docker hub"
+    docker image push "${IMG}":latest
+    docker image push "${IMG}":"${APPNEW}"
+  fi
   tweet
 }
 #
