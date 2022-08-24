@@ -3,7 +3,7 @@ set -E              # any trap on ERR is inherited by shell functions
 set -e              # exit if error occurs
 set -u              # treat unset variables and parameters as an error
 set -o pipefail     # fail if pipe failed
-set -x              # show every commond
+#set -x              # show every commond
 #
 DOCKER_PASSTHOUGH=""
 set +u
@@ -30,8 +30,7 @@ if [[ -z "${DISTRO}" || $? != 0 ]]; then
 else
   HAVE_IP=1
 fi
-CO='forwardcomputers'
-echo "zzz ${CO}"
+CO="forwardcomputers"
 set +u
 if [[ "${CIRCLECI}" ]]; then
   ROOT="${CIRCLE_WORKING_DIRECTORY}/"
@@ -51,7 +50,7 @@ NAME=$( echo "${2-none}" | cut -d '/' -f 1 )
 if [[ -h "${ROOT}${NAME}" ]]; then
   NAME=$(readlink --quiet --silent "${ROOT}${NAME}")
 fi
-IMG="${CO}/${NAME}"
+IMG="forwardcomputers/${NAME}"
 DESKTOP_DOCKERFILE=
 HAVE_DOCKERFILE=0
 DOCKERFILE_DOCKER_OPT=()
@@ -197,7 +196,7 @@ info_all () { ## Check if there is a newer version for all applications
   printf '%s\n' "Info on applications" 
   all_apps
   for NAME in "${APPS[@]}"; do
-    IMG="${CO}/${NAME}"
+    IMG="forwardcomputers/${NAME}"
     appversions
     info
   done
@@ -224,7 +223,7 @@ upgrade_all () { ## Upgrade all applications
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="${CO}/${NAME}"
+    IMG="forwardcomputers/${NAME}"
     appversions
     upgrade
   done
@@ -236,7 +235,7 @@ upgrade_all_ci () {
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="${CO}/${NAME}"
+    IMG="forwardcomputers/${NAME}"
     appversions
     upgrade
     #shellcheck disable=SC2046
@@ -256,7 +255,7 @@ rebuild_all () { ## Rebuild all applications
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="${CO}/${NAME}"
+    IMG="forwardcomputers/${NAME}"
     appversions
     build
     push
@@ -272,7 +271,7 @@ rebuild_all_ci () {
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="${CO}/${NAME}"
+    IMG="forwardcomputers/${NAME}"
     appversions
     build
     push
@@ -285,7 +284,6 @@ rebuild_all_ci () {
 }
 #
 build () { ## Build docker image file
-set -x
   if ! (( "${HAVE_IP}" )); then
     printf '%s\n' "${RED}Cannot build ${GREEN}${NAME}${RED} unable to connect to internet${NC}"
     exit
@@ -302,17 +300,14 @@ set -x
   # docker image build --rm --force-rm --compress \
   # docker image build --rm --force-rm \
   # docker image build \
-echo "${CO}"
-echo "${IMG}"
   docker buildx build "${PLATFORM}" --push \
     --build-arg NAME="${NAME}" \
-    --build-arg CO="${CO}" \
+    --build-arg CO="forwardcomputers" \
     --build-arg APPNEW="${APPNEW}" \
     --build-arg BUILD_DATE="${BUILD_DATE}" \
     --tag "${IMG}" \
     --tag "${IMG}":"${APPNEW}" \
     "${ROOT}${NAME}"
-set +x
 }
 #
 push () {  ## Push image to Docker Hub
