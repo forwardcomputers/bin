@@ -31,6 +31,7 @@ else
   HAVE_IP=1
 fi
 CO="forwardcomputers"
+echo "${CO}"
 set +u
 if [[ "${CIRCLECI}" ]]; then
   ROOT="${CIRCLE_WORKING_DIRECTORY}/"
@@ -51,7 +52,6 @@ if [[ -h "${ROOT}${NAME}" ]]; then
   NAME=$(readlink --quiet --silent "${ROOT}${NAME}")
 fi
 IMG="${CO}/${NAME}"
-echo "${IMG}"
 DESKTOP_DOCKERFILE=
 HAVE_DOCKERFILE=0
 DOCKERFILE_DOCKER_OPT=()
