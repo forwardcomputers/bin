@@ -30,7 +30,7 @@ if [[ -z "${DISTRO}" || $? != 0 ]]; then
 else
   HAVE_IP=1
 fi
-CO="forwardcomputers"
+_GH_NAME="forwardcomputers"
 set +u
 if [[ "${CIRCLECI}" ]]; then
   ROOT="${CIRCLE_WORKING_DIRECTORY}/"
@@ -50,7 +50,7 @@ NAME=$( echo "${2-none}" | cut -d '/' -f 1 )
 if [[ -h "${ROOT}${NAME}" ]]; then
   NAME=$(readlink --quiet --silent "${ROOT}${NAME}")
 fi
-IMG="forwardcomputers/${NAME}"
+IMG="${_GH_NAME}/${NAME}"
 DESKTOP_DOCKERFILE=
 HAVE_DOCKERFILE=0
 DOCKERFILE_DOCKER_OPT=()
@@ -196,7 +196,7 @@ info_all () { ## Check if there is a newer version for all applications
   printf '%s\n' "Info on applications" 
   all_apps
   for NAME in "${APPS[@]}"; do
-    IMG="forwardcomputers/${NAME}"
+    IMG="${_GH_NAME}/${NAME}"
     appversions
     info
   done
@@ -223,7 +223,7 @@ upgrade_all () { ## Upgrade all applications
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="forwardcomputers/${NAME}"
+    IMG="${_GH_NAME}/${NAME}"
     appversions
     upgrade
   done
@@ -235,7 +235,7 @@ upgrade_all_ci () {
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="forwardcomputers/${NAME}"
+    IMG="${_GH_NAME}/${NAME}"
     appversions
     upgrade
     #shellcheck disable=SC2046
@@ -255,7 +255,7 @@ rebuild_all () { ## Rebuild all applications
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="forwardcomputers/${NAME}"
+    IMG="${_GH_NAME}/${NAME}"
     appversions
     build
     push
@@ -271,7 +271,7 @@ rebuild_all_ci () {
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="forwardcomputers/${NAME}"
+    IMG="${_GH_NAME}/${NAME}"
     appversions
     build
     push
