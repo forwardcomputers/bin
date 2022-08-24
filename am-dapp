@@ -30,9 +30,9 @@ if [[ -z "${DISTRO}" || $? != 0 ]]; then
 else
   HAVE_IP=1
 fi
-env
-set
 CO="forwardcomputers"
+_CO="forwardcomputers"
+echo "zzz ${CO} - ${_CO}"
 set +u
 if [[ "${CIRCLECI}" ]]; then
   ROOT="${CIRCLE_WORKING_DIRECTORY}/"
