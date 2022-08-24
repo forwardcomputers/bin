@@ -51,6 +51,7 @@ if [[ -h "${ROOT}${NAME}" ]]; then
   NAME=$(readlink --quiet --silent "${ROOT}${NAME}")
 fi
 IMG="${CO}/${NAME}"
+echo "${IMG}"
 DESKTOP_DOCKERFILE=
 HAVE_DOCKERFILE=0
 DOCKERFILE_DOCKER_OPT=()
@@ -301,6 +302,8 @@ set -x
   # docker image build --rm --force-rm --compress \
   # docker image build --rm --force-rm \
   # docker image build \
+echo "${CO}"
+echo "${IMG}"
   docker buildx build "${PLATFORM}" --push \
     --build-arg NAME="${NAME}" \
     --build-arg CO="${CO}" \
