@@ -31,7 +31,7 @@ else
   HAVE_IP=1
 fi
 CO='forwardcomputers'
-echo "zzz ${CO} - ${_CO}"
+echo "zzz ${CO}"
 set +u
 if [[ "${CIRCLECI}" ]]; then
   ROOT="${CIRCLE_WORKING_DIRECTORY}/"
