@@ -31,7 +31,7 @@ else
   HAVE_IP=1
 fi
 CO="forwardcomputers"
-_CO="forwardcomputers"
+_CO="qazwsx"
 echo "zzz ${CO} - ${_CO}"
 set +u
 if [[ "${CIRCLECI}" ]]; then
