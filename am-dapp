@@ -30,7 +30,7 @@ if [[ -z "${DISTRO}" || $? != 0 ]]; then
 else
   HAVE_IP=1
 fi
-_GH_NAME="forwardcomputers"
+CO="forwardcomputers"
 set +u
 if [[ "${CIRCLECI}" ]]; then
   ROOT="${CIRCLE_WORKING_DIRECTORY}/"
@@ -50,7 +50,7 @@ NAME=$( echo "${2-none}" | cut -d '/' -f 1 )
 if [[ -h "${ROOT}${NAME}" ]]; then
   NAME=$(readlink --quiet --silent "${ROOT}${NAME}")
 fi
-IMG="${_GH_NAME}/${NAME}"
+IMG="${CO}/${NAME}"
 DESKTOP_DOCKERFILE=
 HAVE_DOCKERFILE=0
 DOCKERFILE_DOCKER_OPT=()
@@ -196,7 +196,7 @@ info_all () { ## Check if there is a newer version for all applications
   printf '%s\n' "Info on applications" 
   all_apps
   for NAME in "${APPS[@]}"; do
-    IMG="${_GH_NAME}/${NAME}"
+    IMG="${CO}/${NAME}"
     appversions
     info
   done
@@ -223,7 +223,7 @@ upgrade_all () { ## Upgrade all applications
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="${_GH_NAME}/${NAME}"
+    IMG="${CO}/${NAME}"
     appversions
     upgrade
   done
@@ -235,7 +235,7 @@ upgrade_all_ci () {
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="${_GH_NAME}/${NAME}"
+    IMG="${CO}/${NAME}"
     appversions
     upgrade
     #shellcheck disable=SC2046
@@ -255,7 +255,7 @@ rebuild_all () { ## Rebuild all applications
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="${_GH_NAME}/${NAME}"
+    IMG="${CO}/${NAME}"
     appversions
     build
     push
@@ -271,7 +271,7 @@ rebuild_all_ci () {
   all_apps
   set +e
   for NAME in "${APPS[@]}"; do
-    IMG="${_GH_NAME}/${NAME}"
+    IMG="${CO}/${NAME}"
     appversions
     build
     push
@@ -301,9 +301,10 @@ set -x
   # docker image build --rm --force-rm --compress \
   # docker image build --rm --force-rm \
   # docker image build \
-  docker buildx build "${PLATFORM}" --push \
+  # docker buildx build "${PLATFORM}" --push \
+  docker buildx build --push \
     --build-arg NAME="${NAME}" \
-    --build-arg _GH_NAME="forwardcomputers" \
+    --build-arg CO="${CO}" \
     --build-arg APPNEW="${APPNEW}" \
     --build-arg BUILD_DATE="${BUILD_DATE}" \
     --tag "${IMG}" \
