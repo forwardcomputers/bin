@@ -30,8 +30,7 @@ if [[ -z "${DISTRO}" || $? != 0 ]]; then
 else
   HAVE_IP=1
 fi
-CO="forwardcomputers"
-_CO="qazwsx"
+CO='forwardcomputers'
 echo "zzz ${CO} - ${_CO}"
 set +u
 if [[ "${CIRCLECI}" ]]; then
