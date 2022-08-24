@@ -303,7 +303,7 @@ set -x
   # docker image build \
   # docker buildx build "${PLATFORM}" --push \
   # docker buildx build --push \
-  docker buildx build "$PLATFORM" --push \
+  docker buildx build ${PLATFORM} --push \
     --build-arg NAME="${NAME}" \
     --build-arg CO="${CO}" \
     --build-arg APPNEW="${APPNEW}" \
