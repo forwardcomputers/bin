@@ -303,7 +303,7 @@ set -x
   # docker image build \
   docker buildx build "${PLATFORM}" --push \
     --build-arg NAME="${NAME}" \
-    --build-arg CO="forwardcomputers" \
+    --build-arg _GH_NAME="forwardcomputers" \
     --build-arg APPNEW="${APPNEW}" \
     --build-arg BUILD_DATE="${BUILD_DATE}" \
     --tag "${IMG}" \
