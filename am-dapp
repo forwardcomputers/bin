@@ -3,7 +3,7 @@ set -E              # any trap on ERR is inherited by shell functions
 set -e              # exit if error occurs
 set -u              # treat unset variables and parameters as an error
 set -o pipefail     # fail if pipe failed
-set -x              # show every commond
+# set -x              # show every commond
 #
 DOCKER_PASSTHOUGH=""
 set +u
@@ -284,7 +284,6 @@ rebuild_all_ci () {
 }
 #
 build () { ## Build docker image file
-set -x
   if ! (( "${HAVE_IP}" )); then
     printf '%s\n' "${RED}Cannot build ${GREEN}${NAME}${RED} unable to connect to internet${NC}"
     exit
@@ -297,6 +296,7 @@ set -x
   BUILD_DATE="$(date +'%-d-%-m-%G %r')"
   PLATFORM="$(perl -nle 'print $& if /(?<=^#PLATFORM ).*/' "${ROOT}${NAME}"/Dockerfile || true)"
   printf '%s\n' "Building ${NAME}"
+set -x
   # docker image build --rm --force-rm --squash \
   # docker image build --rm --force-rm --compress \
   # docker image build --rm --force-rm \
@@ -309,7 +309,7 @@ set -x
     --tag "${IMG}" \
     --tag "${IMG}":"${APPNEW}" \
     "${ROOT}${NAME}"
-# set +x
+set +x
 }
 #
 push () {  ## Push image to Docker Hub
