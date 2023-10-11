@@ -233,7 +233,7 @@ upgrade_all () { ## Upgrade all applications
 upgrade_all_ci () {
   printf '%s\n' "Upgrading applications"
   all_apps
-  set +x
+  set -x
   set +e
   for NAME in "${APPS[@]}"; do
     IMG="${CO}/${NAME}"
@@ -242,7 +242,7 @@ upgrade_all_ci () {
     #shellcheck disable=SC2046
     docker image rm -f $( docker image ls -q --filter reference="${IMG}" )
   done
-  set -x
+  set +x
   set -e
 }
 #
