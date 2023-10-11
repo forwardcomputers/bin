@@ -270,6 +270,7 @@ rebuild_all () { ## Rebuild all applications
 }
 #
 rebuild_all_ci () {
+  set +x
   printf '%s\n' "Rebuilding all applications"
   all_apps
   set +e
@@ -283,11 +284,12 @@ rebuild_all_ci () {
     ##shellcheck disable=SC2046
     # docker image rm -f $( docker image ls -q --filter reference="${IMG}" )
   done
+  set -x
   set -e
 }
 #
 build () { ## Build docker image file
-set -x
+# set -x
   if ! (( "${HAVE_IP}" )); then
     printf '%s\n' "${RED}Cannot build ${GREEN}${NAME}${RED} unable to connect to internet${NC}"
     exit
@@ -312,7 +314,7 @@ set -x
     --tag "${IMG}" \
     --tag "${IMG}":"${APPNEW}" \
     "${ROOT}${NAME}"
-set +x
+# set +x
 }
 #
 push () {  ## Push image to Docker Hub
