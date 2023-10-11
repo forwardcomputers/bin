@@ -3,7 +3,7 @@ set -E              # any trap on ERR is inherited by shell functions
 set -e              # exit if error occurs
 set -u              # treat unset variables and parameters as an error
 set -o pipefail     # fail if pipe failed
-#set -x              # show every commond
+set -x              # show every commond
 #
 DOCKER_PASSTHOUGH=""
 set +u
@@ -309,7 +309,7 @@ set -x
     --tag "${IMG}" \
     --tag "${IMG}":"${APPNEW}" \
     "${ROOT}${NAME}"
-set +x
+# set +x
 }
 #
 push () {  ## Push image to Docker Hub
