@@ -210,8 +210,8 @@ upgrade () { ## Upgrade if there is a newer application version
   printf '%s' "${GREEN}Upgrading ${YELLOW}${NAME}${NC} - "
   info
   if [[ -f /tmp/MAKE_REBUILD ]]; then
-    build
-    push
+    # build
+    # push
     printf '%s\n' "${GREEN}Rebuilt ${YELLOW}${NAME}${GREEN} to the latest version ${YELLOW}${APPNEW}${NC}"
     rm -f /tmp/MAKE_REBUILD
     readme
@@ -239,9 +239,9 @@ upgrade_all_ci () {
   # for NAME in "${APPS[@]}"; do
     IMG="${CO}/${NAME}"
     appversions
-    # upgrade
+    upgrade
     #shellcheck disable=SC2046
-    docker image rm -f $( docker image ls -q --filter reference="${IMG}" )
+    # docker image rm -f $( docker image ls -q --filter reference="${IMG}" )
   # done
   set +x
   set -e
