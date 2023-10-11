@@ -233,9 +233,8 @@ upgrade_all () { ## Upgrade all applications
 upgrade_all_ci () {
   printf '%s\n' "Upgrading applications"
   all_apps
-  set +e
   set +x
-  # NAME="3d"
+  set +e
   for NAME in "${APPS[@]}"; do
     IMG="${CO}/${NAME}"
     appversions
