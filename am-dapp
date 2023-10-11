@@ -234,7 +234,7 @@ upgrade_all_ci () {
   printf '%s\n' "Upgrading applications"
   all_apps
   set +e
-  # set +x
+  set +x
   # NAME="3d"
   for NAME in "${APPS[@]}"; do
     IMG="${CO}/${NAME}"
@@ -243,7 +243,7 @@ upgrade_all_ci () {
     #shellcheck disable=SC2046
     docker image rm -f $( docker image ls -q --filter reference="${IMG}" )
   done
-  # set -x
+  set -x
   set -e
 }
 #
@@ -270,7 +270,6 @@ rebuild_all () { ## Rebuild all applications
 }
 #
 rebuild_all_ci () {
-  set +x
   printf '%s\n' "Rebuilding all applications"
   all_apps
   set +e
@@ -284,7 +283,6 @@ rebuild_all_ci () {
     ##shellcheck disable=SC2046
     # docker image rm -f $( docker image ls -q --filter reference="${IMG}" )
   done
-  set -x
   set -e
 }
 #
