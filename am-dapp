@@ -519,7 +519,7 @@ appversions () {
 checkbaseimage () {
   rm -f /tmp/MAKE_DISTRO_LOG /tmp/MAKE_DISTRO_UPDATED /tmp/MAKE_REBUILD
   docker image pull "${IMG}":latest > /dev/null 2>&1 || true
-  if [[ "${DISTRO_IMAGE}" ]]; then
+  if [[ "${DISTRO_IMAGE}" != *"python"* ]]; then
     docker image pull "${DISTRO_IMAGE}" > /tmp/MAKE_DISTRO_LOG
   fi
   # shellcheck disable=SC2143
