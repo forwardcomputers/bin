@@ -240,7 +240,7 @@ upgrade_all_ci () {
     upgrade
     #shellcheck disable=SC2046
     set -x
-    docker image rm -f $( docker image ls -q --filter reference="${IMG}" )
+    docker image rm -f $( docker image ls -q --filter reference="${IMG}" ) || true
     set +x
   done
   set -e
