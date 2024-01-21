@@ -307,6 +307,7 @@ set -x
   # docker image build \
   # docker buildx build ${PLATFORM} --push \
   docker image build \
+    --label "poi=qazwsx" \
     --build-arg NAME="${NAME}" \
     --build-arg CO="${CO}" \
     --build-arg APPNEW="${APPNEW}" \
