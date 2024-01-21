@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
+set -x
 # Bash only - set -o pipefail
-trap cleanup EXIT
 #
 # Script to prune old workflow runs for given repository
 #
@@ -16,7 +16,11 @@ _SCRIPT_URL="https://github.com/forwardcomputers/bin/raw/main/am-gitpruneruns"
 _SCRIPT_NAME=$( basename "${0}")
 _HEAD="Accept: application/vnd.github+json"
 _AUTH="Authorization: token $_TOKEN"
-[ -n "${_DAYS+x}" ] && _SINCE=$( date --date="${_DAYS:-30} days ago" +%Y-%m-%d ) || _SINCE=$( date --date="30 days ago" +%Y-%m-%d )
+if [ $( uname -s ) = "Darwin" ]; then
+  [ -n "${_DAYS+x}" ] && _SINCE=$( date -j -v -${_DAYS:-30}d +%Y-%m-%d ) || _SINCE=$( date -j -v -30d +%Y-%m-%d )
+else
+  [ -n "${_DAYS+x}" ] && _SINCE=$( date --date="${_DAYS:-30} days ago" +%Y-%m-%d ) || _SINCE=$( date --date="30 days ago" +%Y-%m-%d )
+fi
 #
 do_git_action() {
   _ACTION="${1}"
@@ -34,31 +38,48 @@ do_git_action() {
 }
 #
 usage() {
-  cat <<_EOF
-
-GitHub prune workflow runs v${_VERSION} (${_SCRIPT_URL})
-Released under CC0, with no warranty and no liability. Use on your own risk.
-
-Usage: ${_SCRIPT_NAME} [Options] Repository
-
-Script to prune old workflow runs for given repository
-
-Options:
-
-    --cancelled       Cancelled runs only
-    --completed       Completed runs only
--d, --days <number>   Days to keep (default 30 days)
-    --failure         Failed runs only
--f, --force           Force pruning (Dry run normally)
--h, --help            Print this help and exit
--s, --since <string>  Keep since yyyy-mm-dd
-    --skipped         Skipped runs only
-    --success         Successful runs only
--v, --verbose         Make the operation more talkative
-
-_EOF
+  printf "GitHub prune workflow runs v%s (%s)\nReleased under CC0, with no warranty and no liability. Use on your own risk.\n\n" "${_VERSION}" "${_SCRIPT_URL}"
+  printf "Usage: %s [Options] Repository\n\n" "${_SCRIPT_NAME}"
+  printf "Script to prune old workflow runs for given repository\n\n"
+  printf "Options:\n\n"
+  printf "    --cancelled       Cancelled runs only\n"
+  printf "    --completed       Completed runs only\n"
+  printf "-d, --days <number>   Days to keep (default 30 days)\n"
+  printf "    --failure         Failed runs only\n"
+  printf "-f, --force           Force pruning (Dry run normally)\n"
+  printf "-h, --help            Print this help and exit\n"
+  printf "-s, --since <string>  Keep since yyyy-mm-dd\n"
+  printf "    --skipped         Skipped runs only\n"
+  printf "    --success         Successful runs only\n"
+  printf "-v, --verbose         Make the operation more talkative\n\n"
   exit
 }
+# usage() {
+#   cat <<_EOF
+
+# GitHub prune workflow runs v${_VERSION} (${_SCRIPT_URL})
+# Released under CC0, with no warranty and no liability. Use on your own risk.
+
+# Usage: ${_SCRIPT_NAME} [Options] Repository
+
+# Script to prune old workflow runs for given repository
+
+# Options:
+
+#     --cancelled       Cancelled runs only
+#     --completed       Completed runs only
+# -d, --days <number>   Days to keep (default 30 days)
+#     --failure         Failed runs only
+# -f, --force           Force pruning (Dry run normally)
+# -h, --help            Print this help and exit
+# -s, --since <string>  Keep since yyyy-mm-dd
+#     --skipped         Skipped runs only
+#     --success         Successful runs only
+# -v, --verbose         Make the operation more talkative
+
+# _EOF
+#   exit
+# }
 #
 cleanup() {
   [ $? -eq 0 ] && exit
@@ -102,6 +123,7 @@ parse_params() {
   return 0
 }
 #
+trap cleanup EXIT
 parse_params "$@"
 #
 echo "${_REPO}" | grep -q "/" || _REPO="${_OWNER-}${_REPO}"

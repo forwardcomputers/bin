@@ -305,7 +305,8 @@ set -x
   # docker image build --rm --force-rm --compress \
   # docker image build --rm --force-rm \
   # docker image build \
-  docker buildx build ${PLATFORM} --push \
+  # docker buildx build ${PLATFORM} --push \
+  docker image build ${PLATFORM} --push \
     --build-arg NAME="${NAME}" \
     --build-arg CO="${CO}" \
     --build-arg APPNEW="${APPNEW}" \
@@ -459,7 +460,7 @@ readme () { ## Create readme file
     "---" \
     "| Repository | Status | GitHub | Docker | Tag | Size | Layers |" \
     "| --- | --- | :---: | :---: | :--- | :---: | :---: |" \
-    "| [![](https://img.shields.io/badge/dockerfiles-grey.svg)](https://github.com/forwardcomputers/dockerfiles) | [![](https://img.shields.io/github/workflow/status/forwardcomputers/dockerfiles/build_all?label)](https://github.com/forwardcomputers/dockerfiles/actions) | [![](https://img.shields.io/badge/github--grey.svg?label=&logo=github&logoColor=white)](https://github.com/forwardcomputers/dockerfiles) | [![](https://img.shields.io/badge/docker--E5E5E5.svg?label=&logo=docker)](https://hub.docker.com/r/forwardcomputers) |" > "${ROOT}"README.md
+    "| [![](https://img.shields.io/badge/dockerfiles-grey.svg)](https://github.com/forwardcomputers/dockerfiles) | [![](https://img.shields.io/github/actions/workflow/status/forwardcomputers/dockerfiles/build_all.yml?label)](https://github.com/forwardcomputers/dockerfiles/actions) | [![](https://img.shields.io/badge/github--grey.svg?label=&logo=github&logoColor=white)](https://github.com/forwardcomputers/dockerfiles) | [![](https://img.shields.io/badge/docker--E5E5E5.svg?label=&logo=docker)](https://hub.docker.com/r/forwardcomputers) |" > "${ROOT}"README.md
   for APP in "${APPS[@]}"; do
     printf '%s' \
       "| [![](https://img.shields.io/badge/${APP}-grey.svg)](https://hub.docker.com/r/forwardcomputers/${APP}) " \
@@ -474,10 +475,11 @@ readme () { ## Create readme file
   done
   printf '\n%s' \
     "- This setup is largely based on Jessie Frazelle work [https://github.com/jfrazelle/dockerfiles](https://github.com/jfrazelle/dockerfiles)  " \
-    "- FoxitReader - From the Arch Linux repository @ [https://aur.archlinux.org/packages/foxitreader](https://aur.archlinux.org/packages/foxitreader)  " \
-    "- Code-server  " \
-    "  - Home Assistant Visual Studio Code add-on @ [https://github.com/hassio-addons/addon-vscode](https://github.com/hassio-addons/addon-vscode)  " \
-    "  - LinuxServer @ [https://github.com/linuxserver/docker-code-server](https://github.com/linuxserver/docker-code-server)  ">> "${ROOT}"README.md
+    # "- FoxitReader - From the Arch Linux repository @ [https://aur.archlinux.org/packages/foxitreader](https://aur.archlinux.org/packages/foxitreader)  " \
+    # "- Code-server  " \
+    # "  - Home Assistant Visual Studio Code add-on @ [https://github.com/hassio-addons/addon-vscode](https://github.com/hassio-addons/addon-vscode)  " \
+    # "  - LinuxServer @ [https://github.com/linuxserver/docker-code-server](https://github.com/linuxserver/docker-code-server)  " \
+    "" >> "${ROOT}"README.md
   sed -i 's/firefox-esr-grey/firefox%E2%80%93esr-grey/g' "${ROOT}"README.md
 }
 #
