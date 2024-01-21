@@ -306,7 +306,7 @@ set -x
   # docker image build --rm --force-rm \
   # docker image build \
   # docker buildx build ${PLATFORM} --push \
-  docker image build -\
+  docker image build \
     --build-arg NAME="${NAME}" \
     --build-arg CO="${CO}" \
     --build-arg APPNEW="${APPNEW}" \
