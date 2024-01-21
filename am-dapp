@@ -316,6 +316,7 @@ set -x
     "${ROOT}${NAME}"
 set +x
 }
+
 #
 push () {  ## Push image to Docker Hub
   if [ ! $(perl -nle 'print $& if /(?<=^#PLATFORM ).*/' "${ROOT}${NAME}"/Dockerfile ) ]; then
