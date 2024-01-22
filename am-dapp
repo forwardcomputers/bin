@@ -239,9 +239,9 @@ upgrade_all_ci () {
     appversions
     upgrade
     #shellcheck disable=SC2046
-    set -x
-    docker image rm -f $( docker image ls -q --filter reference="${IMG}" ) || true
-    set +x
+    # set -x
+    # docker image rm -f $( docker image ls -q --filter reference="${IMG}" ) || true
+    # set +x
   done
   set -e
 }
@@ -280,9 +280,9 @@ rebuild_all_ci () {
     printf '%s\n' "${GREEN}Built ${YELLOW}${NAME}${GREEN} to the latest version ${YELLOW}${APPNEW}${NC}"
     rm -f /tmp/MAKE_REBUILD
     #shellcheck disable=SC2046
-    set -x
-    docker image rm -f $( docker image ls -q --filter reference="${IMG}" ) || true
-    set +x
+    # set -x
+    # docker image rm -f $( docker image ls -q --filter reference="${IMG}" ) || true
+    # set +x
   done
   set -e
 }
@@ -462,16 +462,28 @@ readme () { ## Create readme file
     "---" \
     "| Repository | Status | GitHub | Docker | Tag | Size | Layers |" \
     "| --- | --- | :---: | :---: | :--- | :---: | :---: |" \
-    "| [![](https://img.shields.io/badge/dockerfiles-grey.svg)](https://github.com/forwardcomputers/dockerfiles) | [![](https://img.shields.io/github/actions/workflow/status/forwardcomputers/dockerfiles/build_all.yml?label)](https://github.com/forwardcomputers/dockerfiles/actions) | [![](https://img.shields.io/badge/github--grey.svg?label=&logo=github&logoColor=white)](https://github.com/forwardcomputers/dockerfiles) | [![](https://img.shields.io/badge/docker--E5E5E5.svg?label=&logo=docker)](https://hub.docker.com/r/forwardcomputers) |" > "${ROOT}"README.md
+    "| [![](https://img.shields.io/badge/dockerfiles-grey)](https://github.com/forwardcomputers/dockerfiles) | [![](https://img.shields.io/github/actions/workflow/status/forwardcomputers/dockerfiles/build_all.yml?label)](https://github.com/forwardcomputers/dockerfiles/actions) | [![](https://img.shields.io/badge/github--grey.svg?label=&logo=github&logoColor=white)](https://github.com/forwardcomputers/dockerfiles) | [![](https://img.shields.io/badge/docker--E5E5E5.svg?label=&logo=docker)](https://hub.docker.com/r/forwardcomputers) |" > "${ROOT}"README.md
   for APP in "${APPS[@]}"; do
+  set -x
+    _token=$( curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:forwardcomputers/${APP}:pull" | jq -r .token )
+    _digest=$( curl -sL -H "Authorization: Bearer ${_token}" -H "Accept: application/vnd.docker.distribution.manifest.v2+json" "https://registry-1.docker.io/v2/forwardcomputers/${APP}/manifests/latest" | jq -r .config.digest )
+    _blob=$( curl -sL -H "Authorization: Bearer ${_token}" -H "Accept: application/vnd.docker.distribution.manifest.v2+json" "https://registry-1.docker.io/v2/forwardcomputers/${APP}/blobs/${_digest}" )
+    # _rsize=$( curl -sL "https://hub.docker.com/v2/repositories/${_repo}/tags/latest" )
+    #
+    # _size=$( jq -r '((.full_size/1024/1024)*100 | round/100 | tostring)+" MB"' <<< _rsize )
+    _built=$( jq -r '.config.Labels."org.opencontainers.image.created" | gsub("-";"--") | gsub(" ";"_")' <<< $_blob 2> /dev/null ) || echo '0'
+    _version=$( jq -r '.config.Labels."org.opencontainers.image.version"' <<< $_blob 2> /dev/null ) || echo '0'
+    _layers=$( jq -r '.history | length' <<< $_blob 2> /dev/null ) || echo '0'
+  set +x
+    #
     printf '%s' \
-      "| [![](https://img.shields.io/badge/${APP}-grey.svg)](https://hub.docker.com/r/forwardcomputers/${APP}) " \
-      "| [![](https://img.shields.io/badge/dynamic/json.svg?query=$.Labels['org.opencontainers.image.created']&label=&url=https://api.microbadger.com/v1/images/forwardcomputers/${APP})](https://hub.docker.com/r/forwardcomputers/${APP}) " \
+      "| [![](https://img.shields.io/badge/${APP}-grey)](https://hub.docker.com/r/forwardcomputers/${APP}) " \
+      "| ![](https://img.shields.io/badge/${_built}-blue) " \
       "| [![](https://img.shields.io/badge/github--grey.svg?label=&logo=github&logoColor=white)](https://github.com/forwardcomputers/dockerfiles/tree/main/${APP}) " \
       "| [![](https://img.shields.io/badge/docker--E5E5E5.svg?label=&logo=docker)](https://hub.docker.com/r/forwardcomputers/${APP}) " \
-      "| [![](https://img.shields.io/docker/v/forwardcomputers/${APP}/latest?color=blue&label=)](https://hub.docker.com/r/forwardcomputers/${APP}) " \
-      "| [![](https://img.shields.io/docker/image-size/forwardcomputers/${APP}/latest?label=)](http://microbadger.com/images/forwardcomputers/${APP}) " \
-      "| [![](https://img.shields.io/microbadger/layers/forwardcomputers/${APP}.svg?label=)](http://microbadger.com/images/forwardcomputers/${APP}) " \
+      "| [![](https://img.shields.io/badge/${_version}-blue)](https://hub.docker.com/r/forwardcomputers/${APP}) " \
+      "| ![](https://img.shields.io/docker/image-size/forwardcomputers/${APP}/latest?label=) " \
+      "| ![](https://img.shields.io/badge/${_layers}-blue) " \
       "|" >> "${ROOT}"README.md
     printf '\n' >> "${ROOT}"README.md
   done
