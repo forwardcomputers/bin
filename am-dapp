@@ -505,7 +505,7 @@ appversions () {
     done
     if (( "${HAVE_DOCKERFILE}" )); then
       APPNEW="$(perl -nle 'print $& if /(?<=^#APPNEW ).*/' "${ROOT}${NAME}"/Dockerfile 2> /dev/null || true)"
-      if [[ "${APPNEW}" =~ [[:alpha:]] ]]; then APPNEW=0; fi
+      # if [[ "${APPNEW}" =~ [[:alpha:]] ]]; then APPNEW=0; fi
     else
       printf '%s\n' "${RED}Cannot build ${GREEN}${NAME}${RED} missing dockerfile${NC}"
       exit
