@@ -472,7 +472,7 @@ readme () { ## Create readme file
     #
     # _size=$( jq -r '((.full_size/1024/1024)*100 | round/100 | tostring)+" MB"' <<< _rsize )
     _built=$( jq -r '.config.Labels."org.opencontainers.image.created" | gsub("-";"--") | gsub(" ";"_")' <<< $_blob 2> /dev/null ) || echo '0'
-    _version=$( jq -r '.config.Labels."org.opencontainers.image.version"' <<< $_blob 2> /dev/null ) || echo '0'
+    _version=$( jq -r '.config.Labels."org.opencontainers.image.version"' | gsub("-";"--") <<< $_blob 2> /dev/null ) || echo '0'
     _layers=$( jq -r '.history | length' <<< $_blob 2> /dev/null ) || echo '0'
     #
     printf '%s' \
