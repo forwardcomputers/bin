@@ -39,8 +39,8 @@ _url="https://github.com/ipxe/ipxe.git"
 printf '{"distro":"ipxe","name":"ipxe","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # buildroot
 _version=$( curl -sL "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" | jq -r '.[1].name | gsub("v";"")' )
-_sha=$( curl -L "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/commits/master" | jq -r '.id' )
-_url="https://gitlab.com/buildroot.org/buildroot.git"
+_sha=$( curl -L "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" | jq -r '.[1].target' )
+_url="https://buildroot.org/downloads/buildroot-${_version}.tar.gz"
 printf '{"distro":"buildroot","name":"buildroot","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # gparted
 _page=$( curl -sL https://gparted.org/gparted-live/stable/CHECKSUMS.TXT )
