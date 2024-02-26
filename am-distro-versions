@@ -85,10 +85,11 @@ printf '{"distro":"RPiUEFI","name":"4","version":"%s","sha":"%s","date":"%s","me
 _page=$( curl -sL https://downloads.raspberrypi.org/operating-systems-categories.json )
 for _type in 'with desktop' 'Lite' ; do
   _sha=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).sha256' <<< "${_page}" )
+  _kernel=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).kernelVersion' <<< "${_page}" )
   _version=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ) | .debianVersion + " - " + .version' <<< "${_page}" )
   _media="${_type/with d/D}"
   _url=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).urlHttp' <<< "${_page}" )
-  printf '{"distro":"rpios","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_media}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
+  printf '{"distro":"rpios","name":"%s","kernel":"%s","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_media}" "${_kernel}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 done
 # Alpine
 _page=$( curl -sL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/latest-releases.yaml )
@@ -163,7 +164,7 @@ _url="http://stable.release.flatcar-linux.net/amd64-usr/current"
 _version=$( curl -sL "${_url}/version.txt" | awk -F'=' '/FLATCAR_VERSION=/ {print $2}' )
 _sha=$( curl -sL "${_url}/flatcar_production_pxe.vmlinuz.DIGESTS" | awk '/flatcar_production_pxe.vmlinuz/ {print $1; exit}' )
 _url="${_url}/amd64-usr/current"
-printf '{"distro":"flatcar","name":"","version":"%s","sha":"%s","date":"%s","media":"netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
+printf '{"distro":"flatcar","name":"","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # OpenSUSE
 _url="https://download.opensuse.org/distribution"
 _version=$( curl -sL "${_url}/openSUSE-current/repo/oss/media.1/media" | tac | tac | awk -F'-' '{print $4; exit}' )
