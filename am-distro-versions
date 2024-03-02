@@ -58,10 +58,10 @@ printf '{"distro":"clonezilla","name":"","version":"%s","sha":"%s","date":"%s","
 _sha=$( curl -sL https://rescuedisk.s.kaspersky-labs.com/updatable/2018/bases/krd.xml | awk -F'"' '/databases_timestamp/ {print $2}' )
 _version="${_sha:0:8}"
 _url="https://rescuedisk.s.kaspersky-labs.com/updatable/2018/krd.iso"
-printf '{"distro":"krd","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n'"${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
+printf '{"distro":"krd","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # systemrescue
 _version=$( curl -sL https://gitlab.com/systemrescue/systemrescue-sources/-/raw/main/VERSION )
-_sha=$( curl -sL "https://www.system-rescue.org/releases/${_version}/systemrescue-${_version}-amd64.iso.sha256" | awk '{print $1}')
+_sha=$( curl -sL "https://www.system-rescue.org/releases/${_version}/systemrescue-${_version}-amd64.iso.sha256" | awk '{print $1}' )
 # _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso[/]download/ {print $4}' )
 _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso\/download/ {print $4}' )
 printf '{"distro":"systemrescue","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
