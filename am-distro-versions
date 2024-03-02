@@ -56,14 +56,20 @@ _url="http://free.nchc.org.tw/clonezilla-live/stable/$( awk '/amd64.zip/ {print 
 printf '{"distro":"clonezilla","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # krd
 _sha=$( curl -sL https://rescuedisk.s.kaspersky-labs.com/updatable/2018/bases/krd.xml | awk -F'"' '/databases_timestamp/ {print $2}' )
+_version="${_sha:0:8}"
 _url="https://rescuedisk.s.kaspersky-labs.com/updatable/2018/krd.iso"
-printf '{"distro":"krd","name":"","version":"","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
+printf '{"distro":"krd","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n'"${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # systemrescue
 _version=$( curl -sL https://gitlab.com/systemrescue/systemrescue-sources/-/raw/main/VERSION )
 _sha=$( curl -sL "https://www.system-rescue.org/releases/${_version}/systemrescue-${_version}-amd64.iso.sha256" | awk '{print $1}')
 # _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso[/]download/ {print $4}' )
 _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso\/download/ {print $4}' )
 printf '{"distro":"systemrescue","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
+# shredos
+_page=$( curl -sL https://api.github.com/repos/PartialVolume/shredos.x86_64/releases/latest )
+_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
+_url=$( jq -r '.assets[] | select( ( .content_type | contains( "disk-image" ) ) and ( .name | contains( "i586" ) | not ) ).browser_download_url' <<< $_page )
+printf '{"distro":"shredos","name":"","version":"%s","sha":"","date":"","media":"Netboot","url":"%s"}\n' "${_version}" "${_url}" >> distro.yml
 # openwrt
 _version=$( curl -sL https://api.github.com/repos/openwrt/openwrt/releases/latest | jq -r '.tag_name | gsub("v";"")' )
 _sha=$( curl -sL "https://downloads.openwrt.org/releases/${_version}/targets/x86/64/sha256sums" | awk '/openwrt-'${_version}'-x86-64-generic-ext4-combined.img.gz/ {print $1}')
