@@ -169,7 +169,7 @@ printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s
 _url="http://stable.release.flatcar-linux.net/amd64-usr/current"
 _version=$( curl -sL "${_url}/version.txt" | awk -F'=' '/FLATCAR_VERSION=/ {print $2}' )
 _sha=$( curl -sL "${_url}/flatcar_production_pxe.vmlinuz.DIGESTS" | awk '/flatcar_production_pxe.vmlinuz/ {print $1; exit}' )
-_url="${_url}/amd64-usr/current"
+_url="${_url}"
 printf '{"distro":"flatcar","name":"","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # OpenSUSE
 _url="https://download.opensuse.org/distribution"
