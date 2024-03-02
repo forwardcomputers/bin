@@ -164,7 +164,7 @@ printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s
 _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
 _sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_version}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
 _url="${_url}/Fedora-Cloud-Base-Rawhide-${_version}.x86_64.qcow2"
-printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
+printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # Flatcar
 _url="http://stable.release.flatcar-linux.net/amd64-usr/current"
 _version=$( curl -sL "${_url}/version.txt" | awk -F'=' '/FLATCAR_VERSION=/ {print $2}' )
