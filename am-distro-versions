@@ -173,7 +173,7 @@ _url="${_url}"
 printf '{"distro":"flatcar","name":"","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # OpenSUSE
 _url="https://download.opensuse.org/distribution"
-_version=$( curl -sL "${_url}/openSUSE-current/repo/oss/media.1/media" | tac | tac | awk -F'-' '{print $4; exit}' )
+_version=$( curl -sL "${_url}/openSUSE-current/repo/oss/media.1/media" | awk -F'-' '/Media/ { print $4 }' )
 _url="https://download.opensuse.org/distribution/leap/${_version}"
 _page=$( curl -sL "${_url}/live/openSUSE-Leap-${_version}-KDE-Live-x86_64-Media.iso.sha256" )
 _sha=$( awk '{print $1}' <<< "${_page}" )
