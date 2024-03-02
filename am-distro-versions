@@ -178,13 +178,13 @@ _url="https://download.opensuse.org/distribution/leap/${_version}"
 _page=$( curl -sL "${_url}/live/openSUSE-Leap-${_version}-KDE-Live-x86_64-Media.iso.sha256" )
 _sha=$( awk '{print $1}' <<< "${_page}" )
 _filename=$( awk '{print $2}' <<< "${_page}" )
-_url="${_url}/leap/${_new_version}/live/${_filename}"
+_url="${_url}/live/${_filename}"
 printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 _url="https://download.opensuse.org/distribution/leap/${_version}"
 _page=$( curl -sL "${_url}/appliances/openSUSE-Leap-${_version}-Minimal-VM.x86_64-Cloud.qcow2.sha256")
 _sha=$( awk '{print $1}' <<< "${_page}" )
 _filename=$( awk '{print $2}' <<< "${_page}" )
-_url="${_url}/leap/${_new_version}/live/${_filename}"
+_url="${_url}/leap/${_new_version}/appliances/${_filename}"
 printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 _url="https://download.opensuse.org/tumbleweed/iso"
 _page=$( curl -sL "${_url}/openSUSE-Tumbleweed-KDE-Live-x86_64-Current.iso.sha256" )
