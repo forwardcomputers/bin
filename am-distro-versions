@@ -2,6 +2,7 @@
 #
 set -eE
 #
+# A function to handle errors and display an error message with job name, line of error occurrence, and error code.
 error () {
 		JOB="$0"              # job name
 		LASTLINE="$1"         # line of error occurrence
