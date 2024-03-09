@@ -153,16 +153,18 @@ _sha=$( curl -sL "${_url}/Fedora-Cloud-${_version}-${_release}-x86_64-CHECKSUM" 
 _url="${_url}/Fedora-Cloud-Base-${_version}-${_release}.x86_64.qcow2"
 printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 # Rawhide
-_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide"
-_version=$( curl -sL "${_url}/COMPOSE_ID" | awk -F'-' '{print $3}' )
-_sha=$( curl -sL "${_url}/Everything/x86_64/iso/Fedora-Everything-iso-Rawhide-x86_64-${_version}-CHECKSUM" | awk '/^SHA256/ {print $4}' )
-_url="${_url}/Everything/x86_64/os/images/pxeboot"
+_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64"
+_version=$( curl -sL "${_url}/iso" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {sub(/\.n.*/,""); print $2}' )
+_sha=$( curl -sL "${_url}/iso/Fedora-Everything-iso-Rawhide-x86_64-${_version}-CHECKSUM" | awk '/^SHA256/ {print $4}' )
+_url="${_url}/os/images/pxeboot"
 printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Workstation/x86_64/iso"
+_version=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {sub(/\.n.*/,""); print $2}' )
 _sha=$( curl -sL "${_url}/Fedora-Workstation-iso-Rawhide-x86_64-${_version}-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
 _url="${_url}/Fedora-Workstation-Live-x86_64-Rawhide-${_version}.iso"
 printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
 _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
+_version=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {sub(/\.n.*/,""); print $2}' )
 _sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_version}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
 _url="${_url}/Fedora-Cloud-Base-Rawhide-${_version}.x86_64.qcow2"
 printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> distro.yml
