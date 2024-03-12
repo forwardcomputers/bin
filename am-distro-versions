@@ -170,7 +170,7 @@ _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x8
 _versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' )
 _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
 _sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
-_url="${_url}/Fedora-Cloud-Base-Rawhide-${_versionplus}.x86_64.qcow2"
+_url="${_url}/Fedora-Cloud-Base-Generic.x86_64-Rawhide-${_versionplus}.qcow2"
 printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Flatcar
 _url="http://stable.release.flatcar-linux.net/amd64-usr/current"
