@@ -121,22 +121,39 @@ printf '{"distro":"arch","name":"x86_64","version":"%s","sha":"%s","date":"%s","
 _url="https://geo.mirror.pkgbuild.com/images/latest"
 _sha=$( curl -sL "${_url}/Arch-Linux-x86_64-cloudimg.qcow2.SHA256" | awk '{print $1; exit}' )
 printf '{"distro":"arch","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}/Arch-Linux-x86_64-cloudimg.qcow2" >> "${_outfile}"
-# Debian
-_page=$( curl -sL "https://github.com/docker-library/official-images/raw/master/library/debian" )
-_name=$( awk -F": |, " '/latest/ {print $2}' <<< "${_page}" )
-_version=$( awk '/'"${_name}"' -- Debian / {print $5}' <<< "${_page}" )
-_url="https://cdimage.debian.org/debian"
-_page=$( curl -sL "${_url}-cd/current-live/amd64/iso-hybrid/SHA256SUMS" )
-_sha=$( awk '/amd64-gnome.iso/ {print $1; exit}' <<< "${_page}" )
-printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}/dists/${_name}/main/installer-amd64/current/images/netboot/debian-installer/amd64" >> "${_outfile}"
-_filename=$( awk '/amd64-gnome.iso/ {print $2; exit}' <<< "${_page}" )
-printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}-cd/current-live/amd64/iso-hybrid/${_filename}" >> "${_outfile}"
-_url="https://cdimage.debian.org/mirror/cdimage/cloud"
-_version=$( awk -F. '{print $1}' <<< "${_version}" )
-_filename="debian-${_version}-generic-amd64.qcow2"
-# _sha=$( wget --no-hsts -qO- "${_url}/${_name}/latest/SHA512SUMS" | awk '/generic-amd64.qcow2/ {print $1; exit}' )
-_sha=$( curl -sL "${_url}/${_name}/latest/SHA512SUMS" | tac| tac | awk '/generic-amd64.qcow2/ {print $1; exit}' )
-printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" ""${_url}/${_name}/latest/${_filename}"" >> "${_outfile}"
+# Debian stable
+# _page=$( curl -sL "https://github.com/docker-library/official-images/raw/master/library/debian" )
+# _name=$( awk -F": |, " '/latest/ {print $2}' <<< "${_page}" )
+# _version=$( awk '/'"${_name}"' -- Debian / {print $5}' <<< "${_page}" )
+# _url="https://cdimage.debian.org/debian"
+# _page=$( curl -sL "${_url}-cd/current-live/amd64/iso-hybrid/SHA256SUMS" )
+# _sha=$( awk '/amd64-gnome.iso/ {print $1; exit}' <<< "${_page}" )
+# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}/dists/${_name}/main/installer-amd64/current/images/netboot/debian-installer/amd64" >> "${_outfile}"
+# _filename=$( awk '/amd64-gnome.iso/ {print $2; exit}' <<< "${_page}" )
+# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}-cd/current-live/amd64/iso-hybrid/${_filename}" >> "${_outfile}"
+# _url="https://cdimage.debian.org/mirror/cdimage/cloud"
+# _version=$( awk -F. '{print $1}' <<< "${_version}" )
+# _filename="debian-${_version}-generic-amd64.qcow2"
+# # _sha=$( wget --no-hsts -qO- "${_url}/${_name}/latest/SHA512SUMS" | awk '/generic-amd64.qcow2/ {print $1; exit}' )
+# _sha=$( curl -sL "${_url}/${_name}/latest/SHA512SUMS" | tac| tac | awk '/generic-amd64.qcow2/ {print $1; exit}' )
+# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" ""${_url}/${_name}/latest/${_filename}"" >> "${_outfile}"
+#
+# Debian testing
+_name=$( curl -sL "https://cdimage.debian.org/debian/dists/testing/Release" | awk '/Codename/ {print $2}' )
+_page=$( curl -sL "https://cloud.debian.org/images/cloud/${_name}/daily/latest/SHA512SUMS" )
+_version=$( awk -F- '/generic-amd64-daily.qcow2/ {print $2}' <<< "${_page}")
+_url="https://cdimage.debian.org/debian/dists/testing/main/installer-amd64/current/images"
+_sha=$( curl -sL "${_url}/SHA256SUMS" | awk '/\/netboot\/debian-installer\/amd64\/linux/ {print $1}' )
+_url="${_url}/netboot/debian-installer/amd64"
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://cdimage.debian.org/cdimage/weekly-live-builds/amd64/iso-hybrid"
+_sha=$( curl -sL "${_url}/SHA256SUMS" | awk '/debian-live-testing-amd64-gnome/ {print $1; exit}' )
+_url="${_url}/debian-live-testing-amd64-gnome.iso"
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://cloud.debian.org/images/cloud/trixie/daily/latest"
+_sha=$( awk '/generic-amd64-daily.qcow2/ {print $1}' <<< "${_page}" )
+_url="${_url}/debian-${_version}-generic-amd64-daily.qcow2"
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Fedora
 _version=$( curl -sL https://github.com/docker-library/official-images/raw/master/library/fedora | awk -F": |, " '/latest/ {print $2}' )
 _url="https://dl.fedoraproject.org/pub/fedora"
