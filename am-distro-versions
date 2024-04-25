@@ -278,3 +278,10 @@ done
 _version=$( curl -sL "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/latest-build/buildversions.json" | jq -r '."virtio-win-prewhql".version' )
 _url="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso"
 printf '{"distro":"proxmox","name":"virtio","version":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# realvnc viewer
+_version=$( curl -sL https://www.realvnc.com/en/connect/download/viewer/linux | awk -F'-' '/Standalone/ { print $4 }' )
+_url="https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-${_version}-Linux-x64"
+printf '{"distro":"realvnc","name":"linux","version":"%s","date":"%s","media":"EXE","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_version=$( curl -sL https://www.realvnc.com/en/connect/download/viewer/windows | awk -F'-' '/Windows-64bit.exe/ { print $4 }' )
+_url="https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-${_version}-Windows-64bit.exe"
+printf '{"distro":"realvnc","name":"windows","version":"%s","date":"%s","media":"EXE","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
