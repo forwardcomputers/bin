@@ -243,23 +243,39 @@ _sha=$( curl -sL "${_url}/${_name}/current/SHA256SUMS" | awk '/amd64-disk-kvm.im
 _url="${_url}/${_name}/current/${_name}-server-cloudimg-amd64-disk-kvm.img"
 printf '{"distro":"ubuntu","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Windows 10
+# _page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information )
+# _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}' <<< "${_page}" )
+# _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
+# _id=$( curl -sL --http1.1 "https://api.uupdump.net/listid.php?search=${_build}+amd64" | jq -r '.response.builds[] | select( .title | contains( "Cumulative" ) | not ) | .uuid' )
+# _url="https://uupdump.net/get.php?id=${_id}&pack=en-us&edition=Professional&aria2=2"
 _page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information )
 _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}' <<< "${_page}" )
 _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
-_id=$( curl -sL --http1.1 "https://api.uupdump.net/listid.php?search=${_build}+amd64" | jq -r '.response.builds[] | select( .title | contains( "Cumulative" ) | not ) | .uuid' )
-_url="https://uupdump.net/get.php?id=${_id}&pack=en-us&edition=Professional&aria2=2"
-printf '{"distro":"windows","name":"10","version":"%s","build":"%s","id":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+curl -sL "https://go.microsoft.com/fwlink/?LinkId=841361" -o /tmp/10.cab
+7z e /tmp/10.cab -so products.xml > /tmp/10.xml
+_url=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en_us"]/FilePath)' )
+_sha=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en_us"]/Sha1)' )
+rm /tmp/10.cab /tmp/10.xml
+printf '{"distro":"windows","name":"10","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
 _id=$( curl -sL --http1.1 https://www.catalog.update.microsoft.com/Search.aspx?q=Cumulative%20Windows%2010%20x64%20"${_kb}" | tac | tac | awk -F'id="' '/resultsbottomBorder/ {split($2,a,"_");print a[1]; exit}' )
 _url=$( curl -sL --http1.1 -d 'updateIDs=[{"size":0,"uidInfo":"'${_id}'","updateID":"'${_id}'"}]' -X POST -L https://www.catalog.update.microsoft.com/DownloadDialog.aspx | awk -F"'" '/url =/ {print $2}' )
 printf '{"distro":"windows","name":"10","version":"%s","build":"%s","kb":"%s","id":"%s","date":"%s","media":"Update","url":"%s"}\n' "${_version}" "${_build}" "${_kb}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Windows 11
+# _page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information )
+# _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}'  <<< "${_page}" )
+# _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
+# _id=$( curl -sL --http1.1 "https://api.uupdump.net/listid.php?search=${_build}+amd64" | jq -r '.response.builds[] | select( .title | contains( "Cumulative" ) | not ) | .uuid' )
+# _url="https://uupdump.net/get.php?id=${_id}&pack=en-us&edition=Professional&aria2=2"
 _page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information )
 _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}'  <<< "${_page}" )
 _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
-_id=$( curl -sL --http1.1 "https://api.uupdump.net/listid.php?search=${_build}+amd64" | jq -r '.response.builds[] | select( .title | contains( "Cumulative" ) | not ) | .uuid' )
-_url="https://uupdump.net/get.php?id=${_id}&pack=en-us&edition=Professional&aria2=2"
-printf '{"distro":"windows","name":"11","version":"%s","build":"%s","id":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+curl -sL "https://go.microsoft.com/fwlink?linkid=2156292" -o /tmp/11.cab
+7z e /tmp/11.cab -so products.xml > /tmp/11.xml
+_url=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en_us"]/FilePath)' )
+_sha=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en_us"]/Sha1)' )
+rm /tmp/11.cab /tmp/11.xml
+printf '{"distro":"windows","name":"11","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
 _id=$( curl -sL --http1.1 https://www.catalog.update.microsoft.com/Search.aspx?q=Cumulative%20Windows%2011%20x64%20"${_kb}" | tac | tac | awk -F'id="' '/resultsbottomBorder/ {split($2,a,"_");print a[1]; exit}' )
 _url=$( curl -sL --http1.1 -d 'updateIDs=[{"size":0,"uidInfo":"'${_id}'","updateID":"'${_id}'"}]' -X POST -L https://www.catalog.update.microsoft.com/DownloadDialog.aspx | awk -F"'" '/url =/ {print $2}' )
