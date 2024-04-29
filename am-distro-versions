@@ -168,7 +168,7 @@ _url="${_url}/Fedora-Workstation-Live-x86_64-${_version}-${_release}.iso"
 printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Cloud/x86_64/images"
 _sha=$( curl -sL "${_url}/Fedora-Cloud-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
-_url="${_url}/Fedora-Cloud-Base-${_version}-${_release}.x86_64.qcow2"
+_url="${_url}/Fedora-Cloud-Base-Generic.x86_64-${_version}-${_release}.qcow2"
 printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Rawhide
 _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64"
