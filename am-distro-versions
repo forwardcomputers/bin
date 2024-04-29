@@ -253,8 +253,8 @@ _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getli
 _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
 curl -sL "https://go.microsoft.com/fwlink/?LinkId=841361" -o /tmp/10.cab
 7z e /tmp/10.cab -so products.xml > /tmp/10.xml
-_url=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en_us"]/FilePath)' )
-_sha=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en_us"]/Sha1)' )
+_url=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/FilePath)' )
+_sha=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/Sha1)' )
 rm /tmp/10.cab /tmp/10.xml
 printf '{"distro":"windows","name":"10","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
@@ -272,8 +272,8 @@ _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getli
 _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
 curl -sL "https://go.microsoft.com/fwlink?linkid=2156292" -o /tmp/11.cab
 7z e /tmp/11.cab -so products.xml > /tmp/11.xml
-_url=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en_us"]/FilePath)' )
-_sha=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en_us"]/Sha1)' )
+_url=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/FilePath)' )
+_sha=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/Sha1)' )
 rm /tmp/11.cab /tmp/11.xml
 printf '{"distro":"windows","name":"11","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
