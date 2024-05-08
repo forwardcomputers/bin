@@ -40,8 +40,9 @@ _sha=$( curl -sL https://api.github.com/repos/ipxe/ipxe/commits/master | jq -r '
 _url="https://github.com/ipxe/ipxe.git"
 printf '{"distro":"ipxe","name":"ipxe","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # buildroot
-_version=$( curl -sL "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" | jq -r '.[1].name | gsub("v";"")' )
-_sha=$( curl -L "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" | jq -r '.[1].target' )
+_page=$( curl -sL "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" )
+_version=$( jq -r '.[1].name | gsub("v";"")' <<< "${_page}" )
+_sha=$( jq -r '.[1].target' <<< "${_page}" )
 _url="https://buildroot.org/downloads/buildroot-${_version}.tar.gz"
 printf '{"distro":"buildroot","name":"buildroot","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # gparted
@@ -62,7 +63,8 @@ _version="${_sha:0:8}"
 _url="https://rescuedisk.s.kaspersky-labs.com/updatable/2018/krd.iso"
 printf '{"distro":"krd","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # systemrescue
-_version=$( curl -sL https://gitlab.com/systemrescue/systemrescue-sources/-/raw/main/VERSION )
+# _version=$( curl -sL https://gitlab.com/systemrescue/systemrescue-sources/-/raw/main/VERSION )
+_version=$( curl -sL "https://gitlab.com/api/v4/projects/systemrescue%2Fsystemrescue-sources/repository/tags" | jq -r '.[0].name' )
 _sha=$( curl -sL "https://www.system-rescue.org/releases/${_version}/systemrescue-${_version}-amd64.iso.sha256" | awk '{print $1}' )
 # _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso[/]download/ {print $4}' )
 _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso\/download/ {print $4}' )
@@ -311,12 +313,10 @@ _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
 _sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
 _url=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
 printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# bat
-_app_repo="sharkdp"
-_app_name="bat"
-_app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
-_page=$( curl -sL "${_app_url}/releases/latest")
-_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-_sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
-_url=$( jq -r '.assets[] | select(.name | test(".*bat_.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
-printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# trash-cli
+_app_repo="debian"
+_app_name="trash-cli"
+_version=$( curl -sL "https://salsa.debian.org/api/v4/projects/${_app_repo}%2F${_app_name}/repository/tags" | jq -r '.[0].name | split( "/" )[1]' )
+_url="http://ftp.debian.org/debian/pool/main/${_app_name:0:1}/${_app_name}/${_app_name}_${_version}_all.deb"
+printf '{"distro":"apt","name":"%s","version":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+
