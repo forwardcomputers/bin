@@ -303,8 +303,20 @@ _url="https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-${_ver
 printf '{"distro":"realvnc","name":"windows","version":"%s","date":"%s","media":"EXE","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Local debian apps
 # fastfecth
-_page=$( curl -sL https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest)
+_app_repo="fastfetch-cli"
+_app_name="fastfetch"
+_app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
+_page=$( curl -sL "${_app_url}/releases/latest")
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-_sha=$( curl -sL https://api.github.com/repos/fastfetch-cli/fastfetch/commits/master | jq -r '.sha' )
+_sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
 _url=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
-printf '{"distro":"apt","name":"fastfetch","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# bat
+_app_repo="sharkdp"
+_app_name="bat"
+_app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
+_page=$( curl -sL "${_app_url}/releases/latest")
+_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
+_sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
+_url=$( jq -r '.assets[] | select(.name | test(".*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
+printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
