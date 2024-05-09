@@ -1,0 +1,55 @@
+#!/bin/bash
+set -o errexit      # -e, exit if error occurs
+set -o nounset      # -u, treat unset variables and parameters as an error
+set -o pipefail     # fail if pipe failed
+# set -x
+#
+get_distros () {
+	_distros=$( curl "https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/distros.json" )
+}
+#
+_curl () {
+	set +o nounset
+	if [ -n "${3}" ]; then echo "Getting - ${3}"; fi
+	set -o nounset
+	set +o errexit
+	curl -L -f -o "${2}" "${1}"
+	_curlError="$?"
+	set -o errexit
+	if [ "${_curlError}" -ne 0 ]; then
+		echo "Curl Error - ${3:-${1}}"
+	fi
+}
+#
+get_packages () {
+  _apt="~/apt"
+  mkdir -p "/tmp_apt" "${_apt}"
+  rm -rf /tmp_apt/*
+  touch "${_apt}/apt.json"
+  for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
+    if ! jq -e '. | select ( .name==$_name ).version' "${_apt}/apt.json" > /dev/null 2>&1; then
+      jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> "${_apt}/apt.json"
+    fi
+    _old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' "${_apt}/apt.json" )
+    _new_version=$( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).version' <<< $_distros )
+    if [ -z "${_new_version##[0-9]*}" ]; then
+      if [ "${_new_version}" != "${_old_version}" ]; then
+        _curl $( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).url' <<< $_distros ) "/tmp_apt/${i}.deb" "${i} ${_new_version}"
+        chmod -R u+rwx,go+rx,go-w /tmp_apt/*
+        chown -R 1001:20 /tmp_apt/*
+        rm -rf "${_apt}/${i}.deb"
+        mv -f /tmp_apt/* "${_apt}/"
+        jq -r -c --arg _name "${i}" --arg _version "${_new_version}" '. | select ( .name==$_name ).version=$_version' "${_apt}/apt.json" > "${_apt}/apt.json~"
+        mv -f "${_apt}/apt.json~" "${_apt}/apt.json"
+        pushd "${_apt}" >/dev/null
+        dpkg-scanpackages -m . > "${_apt}/Packages"
+        popd >/dev/null
+      fi
+    else
+      echo "Error - ${i} ${_new_version}"
+    fi
+  done
+  rm -rf /tmp_apt/*
+}
+#
+get_packages
