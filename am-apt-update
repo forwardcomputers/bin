@@ -18,7 +18,7 @@ _curl () {
 }
 #
 get_distros () {
-	_distros=$( curl "https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/distros.json" )
+	_distros=$( curl -sL "https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/distros.json" )
 }
 #
 get_packages () {
