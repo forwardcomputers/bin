@@ -22,35 +22,35 @@ get_distros () {
 }
 #
 get_packages () {
-	_apt="~/apt"
-	_tmp="~/tmp_apt"
+	_apt="${HOME}/apt"
+	_tmp="${HOME}/tmp_apt"
 	mkdir -p "${_tmp}" "${_apt}"
 	rm -rf "${_tmp}"/*
-	touch "${_apt}/apt.json"
+ls -la
+
+	pushd "${_apt}" >/dev/null
+	touch apt.json
 	for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
-		if ! jq -e '. | select ( .name==$_name ).version' "${_apt}/apt.json" > /dev/null 2>&1; then
-			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> "${_apt}/apt.json"
+		if ! jq -e '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
+			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
 		fi
-		_old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' "${_apt}/apt.json" )
+		_old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json )
 		_new_version=$( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).version' <<< $_distros )
 		if [ -z "${_new_version##[0-9]*}" ]; then
 			if [ "${_new_version}" != "${_old_version}" ]; then
 				_curl $( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).url' <<< $_distros ) "${_tmp}/${i}.deb" "${i} ${_new_version}"
 				chmod -R u+rwx,go+rx,go-w "${_tmp}"/*
-				rm -rf "${_apt}/${i}.deb"
-				mv -f "${_tmp}"/* "${_apt}"/
-				jq -r -c --arg _name "${i}" --arg _version "${_new_version}" '. | select ( .name==$_name ).version=$_version' "${_apt}/apt.json" > "${_apt}/apt.json~"
-				mv -f "${_apt}/apt.json~" "${_apt}/apt.json"
-				pwd
-				ls -la
-				pushd "${_apt}" >/dev/null
+				rm -rf "${i}.deb"
+				mv -f "${_tmp}"/* .
+				jq -r -c --arg _name "${i}" --arg _version "${_new_version}" '. | select ( .name==$_name ).version=$_version' apt.json > apt.json~
+				mv -f apt.json~ apt.json
 				dpkg-scanpackages -m . > Packages
-				popd >/dev/null
 			fi
 		else
 			echo "Error - ${i} ${_new_version}"
 		fi
 	done
+	popd >/dev/null
 	rm -rf "${_tmp}"
 }
 #
