@@ -41,8 +41,10 @@ get_packages () {
 				mv -f "${_tmp}"/* "${_apt}"/
 				jq -r -c --arg _name "${i}" --arg _version "${_new_version}" '. | select ( .name==$_name ).version=$_version' "${_apt}/apt.json" > "${_apt}/apt.json~"
 				mv -f "${_apt}/apt.json~" "${_apt}/apt.json"
+				pwd
+				ls -la
 				pushd "${_apt}" >/dev/null
-				dpkg-scanpackages -m . > "${_apt}/Packages"
+				dpkg-scanpackages -m . > Packages
 				popd >/dev/null
 			fi
 		else
