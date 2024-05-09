@@ -26,35 +26,32 @@ get_packages () {
 	_tmp="${GITHUB_WORKSPACE}/tmp_apt"
 	mkdir -p "${_tmp}" "${_apt}"
 	rm -rf "${_tmp}"/*
-pwd
-ls -la
-
 	pushd "${_apt}" >/dev/null
 	touch apt.json
-pwd
-ls -la
-# 	for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
-# 		if ! jq -e '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
-# 			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
-# 		fi
-# 		_old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json )
-# 		_new_version=$( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).version' <<< $_distros )
-# 		if [ -z "${_new_version##[0-9]*}" ]; then
-# 			if [ "${_new_version}" != "${_old_version}" ]; then
-# 				_curl $( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).url' <<< $_distros ) "${_tmp}/${i}.deb" "${i} ${_new_version}"
-# 				chmod -R u+rwx,go+rx,go-w "${_tmp}"/*
-# 				rm -rf "${i}.deb"
-# 				mv -f "${_tmp}"/* .
-# 				jq -r -c --arg _name "${i}" --arg _version "${_new_version}" '. | select ( .name==$_name ).version=$_version' apt.json > apt.json~
-# 				mv -f apt.json~ apt.json
-# 				dpkg-scanpackages -m . > Packages
-# 			fi
-# 		else
-# 			echo "Error - ${i} ${_new_version}"
-# 		fi
-# 	done
-# 	popd >/dev/null
-# 	rm -rf "${_tmp}"
+
+	for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
+		if ! jq -e '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
+			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
+		fi
+		_old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json )
+		_new_version=$( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).version' <<< $_distros )
+		if [ -z "${_new_version##[0-9]*}" ]; then
+			if [ "${_new_version}" != "${_old_version}" ]; then
+				_curl $( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).url' <<< $_distros ) "${_tmp}/${i}.deb" "${i} ${_new_version}"
+				chmod -R u+rwx,go+rx,go-w "${_tmp}"/*
+				rm -rf "${i}.deb"
+				mv -f "${_tmp}"/* .
+				jq -r -c --arg _name "${i}" --arg _version "${_new_version}" '. | select ( .name==$_name ).version=$_version' apt.json > apt.json~
+				mv -f apt.json~ apt.json
+				dpkg-scanpackages -m . > Packages
+			fi
+		else
+			echo "Error - ${i} ${_new_version}"
+		fi
+	done
+
+	popd >/dev/null
+	rm -rf "${_tmp}"
 }
 #
 get_distros
