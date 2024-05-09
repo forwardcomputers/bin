@@ -4,10 +4,6 @@ set -o nounset      # -u, treat unset variables and parameters as an error
 set -o pipefail     # fail if pipe failed
 # set -x
 #
-get_distros () {
-	_distros=$( curl "https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/distros.json" )
-}
-#
 _curl () {
 	set +o nounset
 	if [ -n "${3}" ]; then echo "Getting - ${3}"; fi
@@ -19,6 +15,10 @@ _curl () {
 	if [ "${_curlError}" -ne 0 ]; then
 		echo "Curl Error - ${3:-${1}}"
 	fi
+}
+#
+get_distros () {
+	_distros=$( curl "https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/distros.json" )
 }
 #
 get_packages () {
@@ -53,4 +53,5 @@ get_packages () {
   rm -rf "${_tmp}"
 }
 #
+get_distros
 get_packages
