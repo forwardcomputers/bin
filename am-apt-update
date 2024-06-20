@@ -1,17 +1,17 @@
 #!/bin/bash
-# set -o errexit      # -e, exit if error occurs
-# set -o nounset      # -u, treat unset variables and parameters as an error
-# set -o pipefail     # fail if pipe failed
+set -o errexit      # -e, exit if error occurs
+set -o nounset      # -u, treat unset variables and parameters as an error
+set -o pipefail     # fail if pipe failed
 set -x
 #
 _curl () {
-	# set +o nounset
+	set +o nounset
 	if [ -n "${3}" ]; then echo "Getting - ${3}"; fi
-	# set -o nounset
-	# set +o errexit
+	set -o nounset
+	set +o errexit
 	curl -sL -f -o "${2}" "${1}"
 	_curlError="$?"
-	# set -o errexit
+	set -o errexit
 	if [ "${_curlError}" -ne 0 ]; then
 		echo "Curl Error - ${3:-${1}}"
 	fi
@@ -29,13 +29,15 @@ get_packages () {
 	rm -rf "${_tmp}"/*
 	touch apt.json
 
+jq --version
+
 	for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
 		# if ! jq -e --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
-		jq -e --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1
-		if [ $? -ne 0 ]; then
-			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
-		fi
 		_old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json )
+		if [ -z "${_old_version##[0-9]*}" ]; then
+			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
+      _old_version="0.0"
+		fi
 		_new_version=$( jq -r --arg _name "${i}" '. | select( .distro=="apt" and .name==$_name ).version' <<< $_distros )
 		if [ -z "${_new_version##[0-9]*}" ]; then
 			if [ "${_new_version}" != "${_old_version}" ]; then
