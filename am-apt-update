@@ -22,7 +22,6 @@ get_distros () {
 }
 #
 get_packages () {
-  GITHUB_WORKSPACE="/opt/filer/zzz/apt"
 	_apt="${GITHUB_WORKSPACE}/apt"
 	_tmp="${GITHUB_WORKSPACE}/tmp_apt"
 	mkdir -p "${_tmp}" "${_apt}"
