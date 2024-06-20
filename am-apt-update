@@ -31,6 +31,7 @@ get_packages () {
 	touch apt.json
 
 	for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
+set -x
 		if ! jq -e --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
 			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
 		fi
@@ -49,6 +50,7 @@ get_packages () {
 		else
 			echo "Error - ${i} ${_new_version}"
 		fi
+set +x
 	done
 
 	popd >/dev/null
