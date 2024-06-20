@@ -34,8 +34,7 @@ set -x
 cat apt.json
 		# if ! jq -e --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
 		jq -e --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1
-    _return_status=$?
-		if [ $_return_status -ne 0 ]; then
+		if [ $? -ne 0 ]; then
 			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
 		fi
 		_old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json )
