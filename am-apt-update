@@ -1,5 +1,5 @@
 #!/bin/bash
-set -o errexit      # -e, exit if error occurs
+# set -o errexit      # -e, exit if error occurs
 set -o nounset      # -u, treat unset variables and parameters as an error
 set -o pipefail     # fail if pipe failed
 # set -x
