@@ -2,7 +2,7 @@
 set -o errexit      # -e, exit if error occurs
 set -o nounset      # -u, treat unset variables and parameters as an error
 set -o pipefail     # fail if pipe failed
-set -x
+# set -x
 #
 _curl () {
 	set +o nounset
@@ -30,7 +30,6 @@ get_packages () {
 	touch apt.json
 
 	for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
-		# if ! jq -e --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
 		_old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json )
 		if [ -z "${_old_version}" ]; then
 			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
