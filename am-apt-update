@@ -25,8 +25,8 @@ get_packages () {
 	_apt="${GITHUB_WORKSPACE}/apt"
 	_tmp="${GITHUB_WORKSPACE}/tmp_apt"
 	mkdir -p "${_tmp}" "${_apt}"
-	rm -rf "${_tmp}"/*
 	pushd "${_apt}" >/dev/null
+	rm -rf "${_tmp}"/* apt.json
 	touch apt.json
 
 	for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
