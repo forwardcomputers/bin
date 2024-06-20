@@ -22,15 +22,16 @@ get_distros () {
 }
 #
 get_packages () {
+  GITHUB_WORKSPACE="/opt/filer/zzz/apt"
 	_apt="${GITHUB_WORKSPACE}/apt"
 	_tmp="${GITHUB_WORKSPACE}/tmp_apt"
 	mkdir -p "${_tmp}" "${_apt}"
 	pushd "${_apt}" >/dev/null
-	rm -rf "${_tmp}"/* apt.json
+	rm -rf "${_tmp}"/*
 	touch apt.json
 
 	for i in $( jq -r '. | select( .distro=="apt" ).name' <<< "${_distros}" ); do
-		if ! jq -e '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
+		if ! jq -e --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json > /dev/null 2>&1; then
 			jq -c -n --arg _name "${i}" '{name: $_name, version: "0.0"}' >> apt.json
 		fi
 		_old_version=$( jq -r --arg _name "${i}" '. | select ( .name==$_name ).version' apt.json )
