@@ -176,19 +176,19 @@ _url="${_url}/Fedora-Cloud-Base-Generic.x86_64-${_version}-${_release}.qcow2"
 printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Rawhide
 _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64"
-_versionplus=$( curl -sL "${_url}/iso" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' )
+_versionplus=$( curl -sL "${_url}/iso" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
 _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
 _sha=$( curl -sL "${_url}/iso/Fedora-Everything-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4}' )
 _url="${_url}/os/images/pxeboot"
 printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Workstation/x86_64/iso"
-_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' )
+_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
 _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
 _sha=$( curl -sL "${_url}/Fedora-Workstation-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
 _url="${_url}/Fedora-Workstation-Live-x86_64-Rawhide-${_versionplus}.iso"
 printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
-_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' )
+_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' | head -1 )
 _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
 _sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
 _url="${_url}/Fedora-Cloud-Base-Generic.x86_64-Rawhide-${_versionplus}.qcow2"
