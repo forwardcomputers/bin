@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-set -eE
+set -eEx
 #
 # A function to handle errors and display an error message with job name, line of error occurrence, and error code.
 error () {
@@ -306,6 +306,17 @@ _version=$( curl -sL https://www.realvnc.com/en/connect/download/viewer/windows 
 _url="https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-${_version}-Windows-64bit.exe"
 printf '{"distro":"realvnc","name":"windows","version":"%s","date":"%s","media":"EXE","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Local debian apps
+# eza
+_app_repo="eza-community"
+_app_name="eza"
+_app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
+_page=$( curl -sL "${_app_url}/releases/latest")
+_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
+_sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
+_url_exec=$( jq -r '.assets[] | select(.name | test(".*x86_64.*musl.*tar")) | .browser_download_url' <<< "${_page}" )
+_url_completions=$( jq -r '.assets[] | select(.name | test(".*completions*")) | .browser_download_url' <<< "${_page}" )
+printf '{"distro":"deb","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url1":"%s","url2":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_exec}" "${_url_completions}" >> "${_outfile}"
+printf '{"distro":"opkg","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url1":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_exec}" >> "${_outfile}"
 # fastfecth
 _app_repo="fastfetch-cli"
 _app_name="fastfetch"
@@ -313,8 +324,10 @@ _app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
 _page=$( curl -sL "${_app_url}/releases/latest")
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
 _sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
-_url=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
-printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url_deb=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
+_url_opkg=$( jq -r '.assets[] | select(.name | test(".*musl.*amd64.*tar")) | .browser_download_url' <<< "${_page}" )
+printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_deb}" >> "${_outfile}"
+printf '{"distro":"opkg","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_opkg}" >> "${_outfile}"
 # trash-cli
 _app_repo="debian"
 _app_name="trash-cli"
