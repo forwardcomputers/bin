@@ -192,7 +192,8 @@ printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s
 #_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
 #_sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
 #_url="${_url}/Fedora-Cloud-Base-Generic.x86_64-Rawhide-${_versionplus}.qcow2"
-_page=$( curl -sL "https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images" )
+_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
+_page=$( curl -sL "${_url}" )
 _versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
 _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
 _shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
