@@ -16,168 +16,164 @@ _dateISO=$( jq -nr 'now | todate' )
 _dateLocal=$( jq -r 'fromdate | strflocaltime("%F %T %p")' <<< '"'${_dateISO}'"' )
 _outfile="distros.json"
 echo -n > "${_outfile}"
-# # oh-my-bash
-# _sha=$( curl -sL https://api.github.com/repos/ohmybash/oh-my-bash/commits/master | jq -r '.sha' )
-# _url="https://github.com/ohmybash/oh-my-bash.git"
-# printf '{"distro":"oh-my-bash","name":"","version":"","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # oh-my-zsh
-# _sha=$( curl -sL https://api.github.com/repos/ohmyzsh/ohmyzsh/commits/master | jq -r '.sha' )
-# _url="https://github.com/ohmyzsh/ohmyzsh.git"
-# printf '{"distro":"oh-my-zsh","name":"","version":"","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # oh-my-posh
-# _version=$( curl -sL https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/releases/latest | jq -r '.tag_name | gsub("v";"")' )
-# _sha=$( curl -sL https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/commits/main | jq -r '.sha' )
-# _url="https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/v${_version}/{posh-darwin-arm64,posh-linux-amd64,posh-linux-arm64,posh-windows-amd64.exe,themes.zip}"
-# printf '{"distro":"oh-my-posh","name":"","version":"%s","sha":"%s","date":"%s","media":"Executable","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # wimboot
-# _version=$( curl -sL https://api.github.com/repos/ipxe/wimboot/releases/latest | jq -r '.tag_name | gsub("v";"")' )
-# _sha=$( curl -sL https://api.github.com/repos/ipxe/wimboot/commits/master | jq -r '.sha' )
-# _url="https://github.com/ipxe/wimboot/raw/master/wimboot"
-# printf '{"distro":"ipxe","name":"wimboot","version":"%s","sha":"%s","date":"%s","media":"Executable","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # ipxe
-# _version=$( curl -sL https://api.github.com/repos/ipxe/ipxe/tags | jq -r '.[0].name | gsub("v";"")' )
-# _sha=$( curl -sL https://api.github.com/repos/ipxe/ipxe/commits/master | jq -r '.sha' )
-# _url="https://github.com/ipxe/ipxe.git"
-# printf '{"distro":"ipxe","name":"ipxe","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # buildroot
-# _page=$( curl -sL "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" )
-# # _version=$( jq -r '.[1].name | gsub("v";"")' <<< "${_page}" )
-# _version=$( curl -sL "https://gitlab.com/buildroot.org/buildroot/-/raw/master/docs/website/download.html" | awk -F'>|<' '/long term support release/ { print $5 }' )
-# # _sha=$( jq -r '.[1].target' <<< "${_page}" )
-# _url="https://buildroot.org/downloads/buildroot-${_version}.tar.gz"
-# _sha=$( curl -sL "${_url}.sign" | awk '/SHA1:/ {print $2}' )
-# printf '{"distro":"buildroot","name":"buildroot","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # gparted
-# _page=$( curl -sL https://gparted.org/gparted-live/stable/CHECKSUMS.TXT )
-# _version=$( awk -F"gparted-live-|-amd64.zip" '/amd64.zip/ {print $2; exit}' <<< ${_page} )
-# _sha=$( awk '/amd64.zip/ {print $1; exit}' <<< "${_page}" )
-# _url="https://downloads.sourceforge.net/gparted/$( awk '/amd64.zip/ {print $2; exit}' <<< ${_page} )"
-# printf '{"distro":"gparted","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # clonezilla
-# _page=$( curl -sL https://clonezilla.org/downloads/stable/data/CHECKSUMS.TXT )
-# _version=$( awk -F"clonezilla-live-|-amd64.zip" '/amd64.zip/ {print $2; exit}' <<< ${_page} )
-# _sha=$( awk '/amd64.zip/ {print $1; exit}' <<< "${_page}" )
-# _url="https://downloads.sourceforge.net/clonezilla/$( awk '/amd64.zip/ {print $2; exit}' <<< ${_page} )"
-# printf '{"distro":"clonezilla","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # krd
-# _sha=$( curl -sL https://rescuedisk.s.kaspersky-labs.com/updatable/2018/bases/krd.xml | awk -F'"' '/databases_timestamp/ {print $2}' )
-# _version="${_sha:0:8}"
-# _url="https://rescuedisk.s.kaspersky-labs.com/updatable/2018/krd.iso"
-# printf '{"distro":"krd","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # systemrescue
-# # _version=$( curl -sL https://gitlab.com/systemrescue/systemrescue-sources/-/raw/main/VERSION )
-# _version=$( curl -sL "https://gitlab.com/api/v4/projects/systemrescue%2Fsystemrescue-sources/repository/tags" | jq -r '.[0].name' )
-# _sha=$( curl -sL "https://www.system-rescue.org/releases/${_version}/systemrescue-${_version}-amd64.iso.sha256" | awk '{print $1}' )
-# # _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso[/]download/ {print $4}' )
-# _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso\/download/ {print $4}' )
-# printf '{"distro":"systemrescue","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # shredos
-# _page=$( curl -sL https://api.github.com/repos/PartialVolume/shredos.x86_64/releases/latest )
-# _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-# _url=$( jq -r '.assets[] | select( ( .content_type | contains( "disk-image" ) ) and ( .name | contains( "i586" ) | not ) ).browser_download_url' <<< $_page )
-# printf '{"distro":"shredos","name":"","version":"%s","sha":"","date":"","media":"Netboot","url":"%s"}\n' "${_version}" "${_url}" >> "${_outfile}"
-# # openwrt
-# _version=$( curl -sL https://api.github.com/repos/openwrt/openwrt/releases/latest | jq -r '.tag_name | gsub("v";"")' )
-# _sha=$( curl -sL "https://downloads.openwrt.org/releases/${_version}/targets/x86/64/sha256sums" | awk '/openwrt-'${_version}'-x86-64-generic-ext4-combined.img.gz/ {print $1}')
-# _url="https://downloads.openwrt.org/releases/${_version}/targets/x86/64/openwrt-${_version}-x86-64-generic-ext4-combined-efi.img.gz"
-# printf '{"distro":"openwrt","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # RPi3 UEFI
-# _page=$( curl -sL https://api.github.com/repos/pftf/RPi3/releases/latest )
-# _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-# _sha=$( curl -sL https://api.github.com/repos/pftf/RPi3/commits/master | jq -r '.sha' )
-# _url=$( jq -r '.assets[].browser_download_url' <<< "${_page}" )
-# printf '{"distro":"RPiUEFI","name":"3","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # RPi4 UEFI
-# _page=$( curl -sL https://api.github.com/repos/pftf/RPi4/releases/latest )
-# _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-# _sha=$( curl -sL https://api.github.com/repos/pftf/RPi4/commits/master | jq -r '.sha' )
-# _url=$( jq -r '.assets[].browser_download_url' <<< "${_page}" )
-# printf '{"distro":"RPiUEFI","name":"4","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # RPi OS
-# _page=$( curl -sL https://downloads.raspberrypi.org/operating-systems-categories.json )
-# for _type in 'with desktop' 'Lite' ; do
-#   _sha=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).sha256' <<< "${_page}" )
-#   _kernel=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).kernelVersion' <<< "${_page}" )
-#   _version=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ) | .debianVersion + " - " + .version' <<< "${_page}" )
-#   _media="${_type/with d/D}"
-#   _url=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).urlHttp' <<< "${_page}" )
-#   printf '{"distro":"rpios","name":"%s","kernel":"%s","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_media}" "${_kernel}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# done
-# # Alpine
-# _page=$( curl -sL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/latest-releases.yaml )
-# _alpine_index=$( yq eval '.[].title | select(. == "Netboot") | path | .[0]' <<< "${_page}" )
-# _sha=$( yq eval '.['"${_alpine_index}"'].sha256' <<< "${_page}" )
-# _version=$( yq eval '.['"${_alpine_index}"'].version' <<< "${_page}" )
-# _url="https://dl-cdn.alpinelinux.org/alpine"
-# printf '{"distro":"alpine","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _page=$( curl -sL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/armhf/latest-releases.yaml )
-# _alpine_index=$( yq eval '.[].title | select(. == "Raspberry Pi") | path | .[0]' <<< "${_page}" )
-# _sha=$( yq eval '.['"${_alpine_index}"'].sha256' <<< "${_page}" )
-# _version=$( yq eval '.['"${_alpine_index}"'].version' <<< "${_page}" )
-# printf '{"distro":"alpine","name":"RPi","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # Arch
-# _url="https://geo.mirror.pkgbuild.com/iso/latest"
-# _page=$( curl -sL "${_url}/sha256sums.txt" )
-# _sha=$( awk '/bootstrap/ {print $1; exit}' <<< "${_page}" )
-# _version=$( awk -F'-' '/bootstrap/ {print $3; exit}' <<< "${_page}" )
-# printf '{"distro":"arch","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}/arch" >> "${_outfile}"
-# printf '{"distro":"arch","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"WSL","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}/archlinux-x86_64.iso" >> "${_outfile}"
-# _url="https://geo.mirror.pkgbuild.com/images/latest"
-# _sha=$( curl -sL "${_url}/Arch-Linux-x86_64-cloudimg.qcow2.SHA256" | awk '{print $1; exit}' )
-# printf '{"distro":"arch","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}/Arch-Linux-x86_64-cloudimg.qcow2" >> "${_outfile}"
-# # Debian stable
-# _url="https://cdimage.debian.org"
-# # _page=$( curl -sL "https://github.com/docker-library/official-images/raw/master/library/debian" )
-# # _name=$( awk -F": |, " '/latest/ {print $2}' <<< "${_page}" )
-# # _version=$( awk '/'"${_name}"' -- Debian / {print $5}' <<< "${_page}" )
-# _page=$( curl -sL "${_url}/debian/dists/stable/Release" )
-# _name=$( awk '/Codename/ {print $2}' <<< "${_page}" )
-# _version=$( awk '/Version/ {print $2}' <<< "${_page}" )
-# _page=$( curl -sL "${_url}/debian-cd/current-live/amd64/iso-hybrid/SHA256SUMS" )
-# _sha=$( awk '/amd64-gnome.iso/ {print $1; exit}' <<< "${_page}" )
-# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}/dists/${_name}/main/installer-amd64/current/images/netboot/debian-installer/amd64" >> "${_outfile}"
-# _filename=$( awk '/amd64-gnome.iso/ {print $2; exit}' <<< "${_page}" )
-# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}-cd/current-live/amd64/iso-hybrid/${_filename}" >> "${_outfile}"
-# # _url="https://cdimage.debian.org/mirror/cdimage/cloud"
-# _url="${_url}/cdimage/cloud/${_name}/latest"
-# _version=$( awk -F. '{print $1}' <<< "${_version}" )
-# _filename="debian-${_version}-generic-amd64.qcow2"
-# # _sha=$( wget --no-hsts -qO- "${_url}/${_name}/latest/SHA512SUMS" | awk '/generic-amd64.qcow2/ {print $1; exit}' )
-# _sha=$( curl -sL "${_url}/SHA512SUMS" | tac| tac | awk '/generic-amd64.qcow2/ {print $1; exit}' )
-# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" ""${_url}/${_filename}"" >> "${_outfile}"
-# # Debian testing
-# # _name=$( curl -sL "https://cdimage.debian.org/debian/dists/testing/Release" | awk '/Codename/ {print $2}' )
-# # _page=$( curl -sL "https://cloud.debian.org/images/cloud/${_name}/daily/latest/SHA512SUMS" )
-# # _version=$( awk -F- '/generic-amd64-daily.qcow2/ {print $2}' <<< "${_page}" )
-# _url="https://cdimage.debian.org"
-# _page=$( curl -sL "${_url}/debian/dists/testing/Release" )
-# _name=$( awk '/Codename/ {print $2}' <<< "${_page}" )
+# oh-my-bash
+_sha=$( curl -sL https://api.github.com/repos/ohmybash/oh-my-bash/commits/master | jq -r '.sha' )
+_url="https://github.com/ohmybash/oh-my-bash.git"
+printf '{"distro":"oh-my-bash","name":"","version":"","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# oh-my-zsh
+_sha=$( curl -sL https://api.github.com/repos/ohmyzsh/ohmyzsh/commits/master | jq -r '.sha' )
+_url="https://github.com/ohmyzsh/ohmyzsh.git"
+printf '{"distro":"oh-my-zsh","name":"","version":"","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# oh-my-posh
+_version=$( curl -sL https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/releases/latest | jq -r '.tag_name | gsub("v";"")' )
+_sha=$( curl -sL https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/commits/main | jq -r '.sha' )
+_url="https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/v${_version}/{posh-darwin-arm64,posh-linux-amd64,posh-linux-arm64,posh-windows-amd64.exe,themes.zip}"
+printf '{"distro":"oh-my-posh","name":"","version":"%s","sha":"%s","date":"%s","media":"Executable","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# wimboot
+_version=$( curl -sL https://api.github.com/repos/ipxe/wimboot/releases/latest | jq -r '.tag_name | gsub("v";"")' )
+_sha=$( curl -sL https://api.github.com/repos/ipxe/wimboot/commits/master | jq -r '.sha' )
+_url="https://github.com/ipxe/wimboot/raw/master/wimboot"
+printf '{"distro":"ipxe","name":"wimboot","version":"%s","sha":"%s","date":"%s","media":"Executable","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# ipxe
+_version=$( curl -sL https://api.github.com/repos/ipxe/ipxe/tags | jq -r '.[0].name | gsub("v";"")' )
+_sha=$( curl -sL https://api.github.com/repos/ipxe/ipxe/commits/master | jq -r '.sha' )
+_url="https://github.com/ipxe/ipxe.git"
+printf '{"distro":"ipxe","name":"ipxe","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# buildroot
+_page=$( curl -sL "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" )
+# _version=$( jq -r '.[1].name | gsub("v";"")' <<< "${_page}" )
+_version=$( curl -sL "https://gitlab.com/buildroot.org/buildroot/-/raw/master/docs/website/download.html" | awk -F'>|<' '/long term support release/ { print $5 }' )
+# _sha=$( jq -r '.[1].target' <<< "${_page}" )
+_url="https://buildroot.org/downloads/buildroot-${_version}.tar.gz"
+_sha=$( curl -sL "${_url}.sign" | awk '/SHA1:/ {print $2}' )
+printf '{"distro":"buildroot","name":"buildroot","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# gparted
+_page=$( curl -sL https://gparted.org/gparted-live/stable/CHECKSUMS.TXT )
+_version=$( awk -F"gparted-live-|-amd64.zip" '/amd64.zip/ {print $2; exit}' <<< ${_page} )
+_sha=$( awk '/amd64.zip/ {print $1; exit}' <<< "${_page}" )
+_url="https://downloads.sourceforge.net/gparted/$( awk '/amd64.zip/ {print $2; exit}' <<< ${_page} )"
+printf '{"distro":"gparted","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# clonezilla
+_page=$( curl -sL https://clonezilla.org/downloads/stable/data/CHECKSUMS.TXT )
+_version=$( awk -F"clonezilla-live-|-amd64.zip" '/amd64.zip/ {print $2; exit}' <<< ${_page} )
+_sha=$( awk '/amd64.zip/ {print $1; exit}' <<< "${_page}" )
+_url="https://downloads.sourceforge.net/clonezilla/$( awk '/amd64.zip/ {print $2; exit}' <<< ${_page} )"
+printf '{"distro":"clonezilla","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# krd
+_sha=$( curl -sL https://rescuedisk.s.kaspersky-labs.com/updatable/2018/bases/krd.xml | awk -F'"' '/databases_timestamp/ {print $2}' )
+_version="${_sha:0:8}"
+_url="https://rescuedisk.s.kaspersky-labs.com/updatable/2018/krd.iso"
+printf '{"distro":"krd","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# systemrescue
+# _version=$( curl -sL https://gitlab.com/systemrescue/systemrescue-sources/-/raw/main/VERSION )
+_version=$( curl -sL "https://gitlab.com/api/v4/projects/systemrescue%2Fsystemrescue-sources/repository/tags" | jq -r '.[0].name' )
+_sha=$( curl -sL "https://www.system-rescue.org/releases/${_version}/systemrescue-${_version}-amd64.iso.sha256" | awk '{print $1}' )
+# _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso[/]download/ {print $4}' )
+_url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso\/download/ {print $4}' )
+printf '{"distro":"systemrescue","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# shredos
+_page=$( curl -sL https://api.github.com/repos/PartialVolume/shredos.x86_64/releases/latest )
+_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
+_url=$( jq -r '.assets[] | select( ( .content_type | contains( "disk-image" ) ) and ( .name | contains( "i586" ) | not ) ).browser_download_url' <<< $_page )
+printf '{"distro":"shredos","name":"","version":"%s","sha":"","date":"","media":"Netboot","url":"%s"}\n' "${_version}" "${_url}" >> "${_outfile}"
+# openwrt
+_version=$( curl -sL https://api.github.com/repos/openwrt/openwrt/releases/latest | jq -r '.tag_name | gsub("v";"")' )
+_sha=$( curl -sL "https://downloads.openwrt.org/releases/${_version}/targets/x86/64/sha256sums" | awk '/openwrt-'${_version}'-x86-64-generic-ext4-combined.img.gz/ {print $1}')
+_url="https://downloads.openwrt.org/releases/${_version}/targets/x86/64/openwrt-${_version}-x86-64-generic-ext4-combined-efi.img.gz"
+printf '{"distro":"openwrt","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# RPi3 UEFI
+_page=$( curl -sL https://api.github.com/repos/pftf/RPi3/releases/latest )
+_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
+_sha=$( curl -sL https://api.github.com/repos/pftf/RPi3/commits/master | jq -r '.sha' )
+_url=$( jq -r '.assets[].browser_download_url' <<< "${_page}" )
+printf '{"distro":"RPiUEFI","name":"3","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# RPi4 UEFI
+_page=$( curl -sL https://api.github.com/repos/pftf/RPi4/releases/latest )
+_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
+_sha=$( curl -sL https://api.github.com/repos/pftf/RPi4/commits/master | jq -r '.sha' )
+_url=$( jq -r '.assets[].browser_download_url' <<< "${_page}" )
+printf '{"distro":"RPiUEFI","name":"4","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# RPi OS
+_page=$( curl -sL https://downloads.raspberrypi.org/operating-systems-categories.json )
+for _type in 'with desktop' 'Lite' ; do
+  _sha=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).sha256' <<< "${_page}" )
+  _kernel=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).kernelVersion' <<< "${_page}" )
+  _version=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ) | .debianVersion + " - " + .version' <<< "${_page}" )
+  _media="${_type/with d/D}"
+  _url=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS '"${_type}"'" ).urlHttp' <<< "${_page}" )
+  printf '{"distro":"rpios","name":"%s","kernel":"%s","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_media}" "${_kernel}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+done
+# Alpine
+_page=$( curl -sL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/latest-releases.yaml )
+_alpine_index=$( yq eval '.[].title | select(. == "Netboot") | path | .[0]' <<< "${_page}" )
+_sha=$( yq eval '.['"${_alpine_index}"'].sha256' <<< "${_page}" )
+_version=$( yq eval '.['"${_alpine_index}"'].version' <<< "${_page}" )
+_url="https://dl-cdn.alpinelinux.org/alpine"
+printf '{"distro":"alpine","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_page=$( curl -sL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/armhf/latest-releases.yaml )
+_alpine_index=$( yq eval '.[].title | select(. == "Raspberry Pi") | path | .[0]' <<< "${_page}" )
+_sha=$( yq eval '.['"${_alpine_index}"'].sha256' <<< "${_page}" )
+_version=$( yq eval '.['"${_alpine_index}"'].version' <<< "${_page}" )
+printf '{"distro":"alpine","name":"RPi","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# Arch
+_url="https://geo.mirror.pkgbuild.com/iso/latest"
+_page=$( curl -sL "${_url}/sha256sums.txt" )
+_sha=$( awk '/bootstrap/ {print $1; exit}' <<< "${_page}" )
+_version=$( awk -F'-' '/bootstrap/ {print $3; exit}' <<< "${_page}" )
+printf '{"distro":"arch","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}/arch" >> "${_outfile}"
+printf '{"distro":"arch","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"WSL","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}/archlinux-x86_64.iso" >> "${_outfile}"
+_url="https://geo.mirror.pkgbuild.com/images/latest"
+_sha=$( curl -sL "${_url}/Arch-Linux-x86_64-cloudimg.qcow2.SHA256" | awk '{print $1; exit}' )
+printf '{"distro":"arch","name":"x86_64","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}/Arch-Linux-x86_64-cloudimg.qcow2" >> "${_outfile}"
+# Debian stable
+_url="https://cdimage.debian.org"
+# _page=$( curl -sL "https://github.com/docker-library/official-images/raw/master/library/debian" )
+# _name=$( awk -F": |, " '/latest/ {print $2}' <<< "${_page}" )
+# _version=$( awk '/'"${_name}"' -- Debian / {print $5}' <<< "${_page}" )
+_page=$( curl -sL "${_url}/debian/dists/stable/Release" )
+_name=$( awk '/Codename/ {print $2}' <<< "${_page}" )
+_version=$( awk '/Version/ {print $2}' <<< "${_page}" )
+_page=$( curl -sL "${_url}/debian-cd/current-live/amd64/iso-hybrid/SHA256SUMS" )
+_sha=$( awk '/amd64-gnome.iso/ {print $1; exit}' <<< "${_page}" )
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}/dists/${_name}/main/installer-amd64/current/images/netboot/debian-installer/amd64" >> "${_outfile}"
+_filename=$( awk '/amd64-gnome.iso/ {print $2; exit}' <<< "${_page}" )
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}-cd/current-live/amd64/iso-hybrid/${_filename}" >> "${_outfile}"
+# _url="https://cdimage.debian.org/mirror/cdimage/cloud"
+_url="${_url}/cdimage/cloud/${_name}/latest"
+_version=$( awk -F. '{print $1}' <<< "${_version}" )
+_filename="debian-${_version}-generic-amd64.qcow2"
+# _sha=$( wget --no-hsts -qO- "${_url}/${_name}/latest/SHA512SUMS" | awk '/generic-amd64.qcow2/ {print $1; exit}' )
+_sha=$( curl -sL "${_url}/SHA512SUMS" | tac| tac | awk '/generic-amd64.qcow2/ {print $1; exit}' )
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" ""${_url}/${_filename}"" >> "${_outfile}"
+# Debian testing
+# _name=$( curl -sL "https://cdimage.debian.org/debian/dists/testing/Release" | awk '/Codename/ {print $2}' )
 # _page=$( curl -sL "https://cloud.debian.org/images/cloud/${_name}/daily/latest/SHA512SUMS" )
 # _version=$( awk -F- '/generic-amd64-daily.qcow2/ {print $2}' <<< "${_page}" )
+_url="https://cdimage.debian.org"
+_page=$( curl -sL "${_url}/debian/dists/testing/Release" )
+_name=$( awk '/Codename/ {print $2}' <<< "${_page}" )
+_page=$( curl -sL "https://cloud.debian.org/images/cloud/${_name}/daily/latest/SHA512SUMS" )
+_version=$( awk -F- '/generic-amd64-daily.qcow2/ {print $2}' <<< "${_page}" )
+_sha=$( awk '/generic-amd64-daily.qcow2/ {print $1}' <<< "${_page}" )
+_urlcloud="${_url}/cdimage/cloud/${_name}/daily/latest/"$( awk '/generic-amd64-daily.qcow2/ {print $2}' <<< "${_page}" )
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_urlcloud}" >> "${_outfile}"
+_url="https://cdimage.debian.org/debian/dists/testing/main/installer-amd64/current/images"
+_sha=$( curl -sL "${_url}/SHA256SUMS" | awk '/\/netboot\/debian-installer\/amd64\/linux/ {print $1}' )
+_url="${_url}/netboot/debian-installer/amd64"
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://cdimage.debian.org/cdimage/weekly-live-builds/amd64/iso-hybrid"
+_sha=$( curl -sL "${_url}/SHA256SUMS" | awk '/debian-live-testing-amd64-gnome/ {print $1; exit}' )
+_url="${_url}/debian-live-testing-amd64-gnome.iso"
+printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# _url="https://cloud.debian.org/images/cloud/trixie/daily/latest"
 # _sha=$( awk '/generic-amd64-daily.qcow2/ {print $1}' <<< "${_page}" )
-# _urlcloud="${_url}/cdimage/cloud/${_name}/daily/latest/"$( awk '/generic-amd64-daily.qcow2/ {print $2}' <<< "${_page}" )
-# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_urlcloud}" >> "${_outfile}"
-# _url="https://cdimage.debian.org/debian/dists/testing/main/installer-amd64/current/images"
-# _sha=$( curl -sL "${_url}/SHA256SUMS" | awk '/\/netboot\/debian-installer\/amd64\/linux/ {print $1}' )
-# _url="${_url}/netboot/debian-installer/amd64"
-# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _url="https://cdimage.debian.org/cdimage/weekly-live-builds/amd64/iso-hybrid"
-# _sha=$( curl -sL "${_url}/SHA256SUMS" | awk '/debian-live-testing-amd64-gnome/ {print $1; exit}' )
-# _url="${_url}/debian-live-testing-amd64-gnome.iso"
-# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # _url="https://cloud.debian.org/images/cloud/trixie/daily/latest"
-# # _sha=$( awk '/generic-amd64-daily.qcow2/ {print $1}' <<< "${_page}" )
-# # _url="${_url}/debian-${_version}-generic-amd64-daily.qcow2"
-# # printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# _url="${_url}/debian-${_version}-generic-amd64-daily.qcow2"
+# printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Fedora
 # _version=$( curl -sL https://github.com/docker-library/official-images/raw/master/library/fedora | awk -F": |, " '/latest/ {print $2}' )
-jq -V
-curl -sL "https://fedorapeople.org/groups/qa/metadata/release.json" | jq -r ".fedora.stable | .[length -1]"
-curl -sL "https://fedorapeople.org/groups/qa/metadata/release.json" | jq -r ".fedora.stable[-1]"
-curl -sL "https://fedorapeople.org/groups/qa/metadata/release.json" | jq -r ".fedora.stable.[-1]"
-_version=$( curl -sL "https://fedorapeople.org/groups/qa/metadata/release.json" | jq -r ".fedora.stable.[-1]" )
+_version=$( curl -sL "https://fedorapeople.org/groups/qa/metadata/release.json" | jq -r ".fedora.stable[-1]" )
 _url="https://dl.fedoraproject.org/pub/fedora"
-# # _release=$( curl -sL "${_url}/imagelist-fedora" | awk '/Fedora-Workstation-Live-x86_64-'"${_version}"'-.*.iso/' | head -1 )
+# _release=$( curl -sL "${_url}/imagelist-fedora" | awk '/Fedora-Workstation-Live-x86_64-'"${_version}"'-.*.iso/' | head -1 )
 # _release=$( curl -sL "${_url}/imagelist-fedora" | grep -o -P '(?<=Fedora-Workstation-Live-x86_64-'"${_version}"'-).*?(?=.iso)' | head -1 )
 # _sha=$( curl -sL "${_url}/linux/releases/${_version}/Everything/x86_64/iso/Fedora-Everything-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA256/ {print $4}' )
 # _url="${_url}/linux/releases/${_version}/Everything/x86_64/os/images/pxeboot"
@@ -188,204 +184,204 @@ _shaurl="${_shaurl}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print
 _sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
 _url="${_url}/"$( awk -F'[.]|\/Fedora|\/boot' '/\/'"${_version}"'\// && /x86/ && /Everything/ && /boot/ {a=$2} END {print a"/pxeboot"}' <<< "${_page}" )
 printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # _url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Workstation/x86_64/iso"
-# # _sha=$( curl -sL "${_url}/Fedora-Workstation-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
-# # _url="${_url}/Fedora-Workstation-Live-x86_64-${_version}-${_release}.iso"
-# _url="https://dl.fedoraproject.org/pub/fedora"
-# _page=$( curl -sL "${_url}/imagelist-fedora" )
-# _url="${_url}/"$( awk -F'[.]|\/Fedora' '/\/'"${_version}"'\// && /x86/ && /Workstation/ && !/osb/ {a=$2} END {print a}' <<< "${_page}" )
-# _page=$( curl -sL "${_url}" )
-# _shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
-# _sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ && !/osb/ {print $4}' )
-# _url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/Live/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
-# printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # _url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Cloud/x86_64/images"
-# # _sha=$( curl -sL "${_url}/Fedora-Cloud-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
-# # _url="${_url}/Fedora-Cloud-Base-Generic.x86_64-${_version}-${_release}.qcow2"
-# _url="https://dl.fedoraproject.org/pub/fedora"
-# _page=$( curl -sL "${_url}/imagelist-fedora" )
-# _url="${_url}/"$( awk -F'[.]|\/Fedora' '/\/'"${_version}"'\// && /x86/ && /Cloud/ && /Generic/ {a=$2} END {print a}' <<< "${_page}" )
-# _page=$( curl -sL "${_url}" )
-# _shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
-# _sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ && /Generic/ {print $4}' )
-# _url="${_url}/"$( awk -F 'Fedora-|[.]qcow2' '/Generic/ {a=$2} END {print "Fedora-"a".qcow2"}' <<< "${_page}" )
-# printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # Rawhide
-# _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/iso"
-# # _versionplus=$( curl -sL "${_url}/iso" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
-# # _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-# # _sha=$( curl -sL "${_url}/iso/Fedora-Everything-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4}' )
-# # _url="${_url}/os/images/pxeboot"
-# _page=$( curl -sL "${_url}" )
-# _versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
+# _url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Workstation/x86_64/iso"
+# _sha=$( curl -sL "${_url}/Fedora-Workstation-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
+# _url="${_url}/Fedora-Workstation-Live-x86_64-${_version}-${_release}.iso"
+_url="https://dl.fedoraproject.org/pub/fedora"
+_page=$( curl -sL "${_url}/imagelist-fedora" )
+_url="${_url}/"$( awk -F'[.]|\/Fedora' '/\/'"${_version}"'\// && /x86/ && /Workstation/ && !/osb/ {a=$2} END {print a}' <<< "${_page}" )
+_page=$( curl -sL "${_url}" )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ && !/osb/ {print $4}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/Live/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
+printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# _url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Cloud/x86_64/images"
+# _sha=$( curl -sL "${_url}/Fedora-Cloud-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
+# _url="${_url}/Fedora-Cloud-Base-Generic.x86_64-${_version}-${_release}.qcow2"
+_url="https://dl.fedoraproject.org/pub/fedora"
+_page=$( curl -sL "${_url}/imagelist-fedora" )
+_url="${_url}/"$( awk -F'[.]|\/Fedora' '/\/'"${_version}"'\// && /x86/ && /Cloud/ && /Generic/ {a=$2} END {print a}' <<< "${_page}" )
+_page=$( curl -sL "${_url}" )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ && /Generic/ {print $4}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]qcow2' '/Generic/ {a=$2} END {print "Fedora-"a".qcow2"}' <<< "${_page}" )
+printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# Rawhide
+_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/iso"
+# _versionplus=$( curl -sL "${_url}/iso" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
 # _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-# _shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
-# _sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
-# _url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/netinst/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
-# printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Workstation/x86_64/iso"
-# # _versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
-# # _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-# # _sha=$( curl -sL "${_url}/Fedora-Workstation-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
-# # _url="${_url}/Fedora-Workstation-Live-x86_64-Rawhide-${_versionplus}.iso"
-# _page=$( curl -sL "${_url}" )
-# _versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
+# _sha=$( curl -sL "${_url}/iso/Fedora-Everything-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4}' )
+# _url="${_url}/os/images/pxeboot"
+_page=$( curl -sL "${_url}" )
+_versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
+_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/netinst/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
+printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Workstation/x86_64/iso"
+# _versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
 # _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-# _shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
-# _sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
-# _url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/Live/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
-# printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
-# #_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' | head -1 )
-# #_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-# #_sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
-# #_url="${_url}/Fedora-Cloud-Base-Generic.x86_64-Rawhide-${_versionplus}.qcow2"
-# _page=$( curl -sL "${_url}" )
-# _versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
-# _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-# _shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
-# _sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
-# _url="${_url}/"$( awk -F 'Fedora-|[.]qcow2' '/Generic/ {a=$2} END {print "Fedora-"a".qcow2"}' <<< "${_page}" )
-# printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # Flatcar
-# _url="http://stable.release.flatcar-linux.net/amd64-usr/current"
-# _version=$( curl -sL "${_url}/version.txt" | awk -F'=' '/FLATCAR_VERSION=/ {print $2}' )
-# _sha=$( curl -sL "${_url}/flatcar_production_pxe.vmlinuz.DIGESTS" | awk '/flatcar_production_pxe.vmlinuz/ {print $1; exit}' )
-# _url="${_url}"
-# printf '{"distro":"flatcar","name":"","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # OpenSUSE
-# _url="https://download.opensuse.org/distribution"
-# _version=$( curl -sL "${_url}/openSUSE-current/repo/oss/media.1/media" | awk -F'-' '/Media/ { print $4 }' )
-# _url="https://download.opensuse.org/distribution/leap/${_version}"
-# _page=$( curl -sL "${_url}/live/openSUSE-Leap-${_version}-KDE-Live-x86_64-Media.iso.sha256" )
-# _sha=$( awk '{print $1}' <<< "${_page}" )
-# _filename=$( awk '{print $2}' <<< "${_page}" )
-# _url="${_url}/live/${_filename}"
-# printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _url="https://download.opensuse.org/distribution/leap/${_version}"
-# _page=$( curl -sL "${_url}/appliances/openSUSE-Leap-${_version}-Minimal-VM.x86_64-Cloud.qcow2.sha256")
-# _sha=$( awk '{print $1}' <<< "${_page}" )
-# _filename=$( awk '{print $2}' <<< "${_page}" )
-# _url="${_url}/appliances/${_filename}"
-# printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _url="https://download.opensuse.org/tumbleweed/iso"
-# _page=$( curl -sL "${_url}/openSUSE-Tumbleweed-KDE-Live-x86_64-Current.iso.sha256" )
-# # _version=$( grep -o -P '(?<=Snapshot).*?(?=-)' <<< "${_page}" )
-# _version=$( awk -F'Snapshot' '{print $2+0}' <<< "${_page}" )
-# _sha=$( awk '{print $1}' <<< "${_page}" )
-# _filename=$( awk '{print $2}' <<< "${_page}" )
-# _url="${_url}/${_filename}"
-# printf '{"distro":"opensuse","name":"tumbleweed","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _url="https://download.opensuse.org/tumbleweed/appliances"
-# _page=$( curl -sL "${_url}/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2.sha256" )
-# _sha=$( awk '{print $1}' <<< "${_page}" )
-# _filename=$( awk '{print $2}' <<< "${_page}" )
-# _url="${_url}/${_filename}"
-# printf '{"distro":"opensuse","name":"tumbleweed","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # Ubuntu
-# _name=$( curl -sL https://raw.githubusercontent.com/tianon/docker-brew-ubuntu-core/master/rolling )
-# _url="https://releases.ubuntu.com"
-# _page=$( curl -sL "${_url}/${_name}/SHA256SUMS" )
-# _version=$( awk -F'-' '{print $2; exit}' <<< "${_page}" )
-# _sha=$( awk '/desktop/ {print $1; exit}' <<< "${_page}" )
-# _filename=$( awk -F'*' '/desktop/ {print $2; exit}' <<< "${_page}" )
-# _url="${_url}/${_name}/${_filename}"
-# printf '{"distro":"ubuntu","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _url="https://releases.ubuntu.com"
-# _sha=$( awk '/live-server/ {print $1; exit}' <<< "${_page}" )
-# _filename=$( awk -F'*' '/live-server/ {print $2; exit}' <<< "${_page}" )
-# _url="${_url}/${_name}/${_filename}"
-# printf '{"distro":"ubuntu","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Server","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _url="https://cloud-images.ubuntu.com"
-# _sha=$( curl -sL "${_url}/${_name}/current/SHA256SUMS" | awk '/amd64-disk-kvm.img/ {print $1}' )
-# _url="${_url}/${_name}/current/${_name}-server-cloudimg-amd64-disk-kvm.img"
-# printf '{"distro":"ubuntu","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # Windows 10
-# # _page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information )
-# # _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}' <<< "${_page}" )
-# # _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
-# # _id=$( curl -sL --http1.1 "https://api.uupdump.net/listid.php?search=${_build}+amd64" | jq -r '.response.builds[] | select( .title | contains( "Cumulative" ) | not ) | .uuid' )
-# # _url="https://uupdump.net/get.php?id=${_id}&pack=en-us&edition=Professional&aria2=2"
+# _sha=$( curl -sL "${_url}/Fedora-Workstation-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
+# _url="${_url}/Fedora-Workstation-Live-x86_64-Rawhide-${_versionplus}.iso"
+_page=$( curl -sL "${_url}" )
+_versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
+_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/Live/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
+printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
+#_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' | head -1 )
+#_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+#_sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
+#_url="${_url}/Fedora-Cloud-Base-Generic.x86_64-Rawhide-${_versionplus}.qcow2"
+_page=$( curl -sL "${_url}" )
+_versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
+_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]qcow2' '/Generic/ {a=$2} END {print "Fedora-"a".qcow2"}' <<< "${_page}" )
+printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# Flatcar
+_url="http://stable.release.flatcar-linux.net/amd64-usr/current"
+_version=$( curl -sL "${_url}/version.txt" | awk -F'=' '/FLATCAR_VERSION=/ {print $2}' )
+_sha=$( curl -sL "${_url}/flatcar_production_pxe.vmlinuz.DIGESTS" | awk '/flatcar_production_pxe.vmlinuz/ {print $1; exit}' )
+_url="${_url}"
+printf '{"distro":"flatcar","name":"","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# OpenSUSE
+_url="https://download.opensuse.org/distribution"
+_version=$( curl -sL "${_url}/openSUSE-current/repo/oss/media.1/media" | awk -F'-' '/Media/ { print $4 }' )
+_url="https://download.opensuse.org/distribution/leap/${_version}"
+_page=$( curl -sL "${_url}/live/openSUSE-Leap-${_version}-KDE-Live-x86_64-Media.iso.sha256" )
+_sha=$( awk '{print $1}' <<< "${_page}" )
+_filename=$( awk '{print $2}' <<< "${_page}" )
+_url="${_url}/live/${_filename}"
+printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://download.opensuse.org/distribution/leap/${_version}"
+_page=$( curl -sL "${_url}/appliances/openSUSE-Leap-${_version}-Minimal-VM.x86_64-Cloud.qcow2.sha256")
+_sha=$( awk '{print $1}' <<< "${_page}" )
+_filename=$( awk '{print $2}' <<< "${_page}" )
+_url="${_url}/appliances/${_filename}"
+printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://download.opensuse.org/tumbleweed/iso"
+_page=$( curl -sL "${_url}/openSUSE-Tumbleweed-KDE-Live-x86_64-Current.iso.sha256" )
+# _version=$( grep -o -P '(?<=Snapshot).*?(?=-)' <<< "${_page}" )
+_version=$( awk -F'Snapshot' '{print $2+0}' <<< "${_page}" )
+_sha=$( awk '{print $1}' <<< "${_page}" )
+_filename=$( awk '{print $2}' <<< "${_page}" )
+_url="${_url}/${_filename}"
+printf '{"distro":"opensuse","name":"tumbleweed","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://download.opensuse.org/tumbleweed/appliances"
+_page=$( curl -sL "${_url}/openSUSE-Tumbleweed-Minimal-VM.x86_64-Cloud.qcow2.sha256" )
+_sha=$( awk '{print $1}' <<< "${_page}" )
+_filename=$( awk '{print $2}' <<< "${_page}" )
+_url="${_url}/${_filename}"
+printf '{"distro":"opensuse","name":"tumbleweed","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# Ubuntu
+_name=$( curl -sL https://raw.githubusercontent.com/tianon/docker-brew-ubuntu-core/master/rolling )
+_url="https://releases.ubuntu.com"
+_page=$( curl -sL "${_url}/${_name}/SHA256SUMS" )
+_version=$( awk -F'-' '{print $2; exit}' <<< "${_page}" )
+_sha=$( awk '/desktop/ {print $1; exit}' <<< "${_page}" )
+_filename=$( awk -F'*' '/desktop/ {print $2; exit}' <<< "${_page}" )
+_url="${_url}/${_name}/${_filename}"
+printf '{"distro":"ubuntu","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://releases.ubuntu.com"
+_sha=$( awk '/live-server/ {print $1; exit}' <<< "${_page}" )
+_filename=$( awk -F'*' '/live-server/ {print $2; exit}' <<< "${_page}" )
+_url="${_url}/${_name}/${_filename}"
+printf '{"distro":"ubuntu","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Server","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://cloud-images.ubuntu.com"
+_sha=$( curl -sL "${_url}/${_name}/current/SHA256SUMS" | awk '/amd64-disk-kvm.img/ {print $1}' )
+_url="${_url}/${_name}/current/${_name}-server-cloudimg-amd64-disk-kvm.img"
+printf '{"distro":"ubuntu","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# Windows 10
 # _page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information )
 # _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}' <<< "${_page}" )
 # _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
-# curl -sL "https://go.microsoft.com/fwlink/?LinkId=841361" -o /tmp/10.cab
-# 7z e /tmp/10.cab -so products.xml > /tmp/10.xml
-# _url=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/FilePath)' )
-# _sha=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/Sha1)' )
-# rm /tmp/10.cab /tmp/10.xml
-# printf '{"distro":"windows","name":"10","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
-# _id=$( curl -sL --http1.1 https://www.catalog.update.microsoft.com/Search.aspx?q=Cumulative%20Windows%2010%20x64%20"${_kb}" | tac | tac | awk -F'id="' '/resultsbottomBorder/ {split($2,a,"_");print a[1]; exit}' )
-# _url=$( curl -sL --http1.1 -d 'updateIDs=[{"size":0,"uidInfo":"'${_id}'","updateID":"'${_id}'"}]' -X POST -L https://www.catalog.update.microsoft.com/DownloadDialog.aspx | awk -F"'" '/url =/ {print $2}' )
-# printf '{"distro":"windows","name":"10","version":"%s","build":"%s","kb":"%s","id":"%s","date":"%s","media":"Update","url":"%s"}\n' "${_version}" "${_build}" "${_kb}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # Windows 11
-# # _page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information )
-# # _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}'  <<< "${_page}" )
-# # _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
-# # _id=$( curl -sL --http1.1 "https://api.uupdump.net/listid.php?search=${_build}+amd64" | jq -r '.response.builds[] | select( .title | contains( "Cumulative" ) | not ) | .uuid' )
-# # _url="https://uupdump.net/get.php?id=${_id}&pack=en-us&edition=Professional&aria2=2"
+# _id=$( curl -sL --http1.1 "https://api.uupdump.net/listid.php?search=${_build}+amd64" | jq -r '.response.builds[] | select( .title | contains( "Cumulative" ) | not ) | .uuid' )
+# _url="https://uupdump.net/get.php?id=${_id}&pack=en-us&edition=Professional&aria2=2"
+_page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information )
+_build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}' <<< "${_page}" )
+_version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
+curl -sL "https://go.microsoft.com/fwlink/?LinkId=841361" -o /tmp/10.cab
+7z e /tmp/10.cab -so products.xml > /tmp/10.xml
+_url=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/FilePath)' )
+_sha=$( xmllint /tmp/10.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/Sha1)' )
+rm /tmp/10.cab /tmp/10.xml
+printf '{"distro":"windows","name":"10","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
+_id=$( curl -sL --http1.1 https://www.catalog.update.microsoft.com/Search.aspx?q=Cumulative%20Windows%2010%20x64%20"${_kb}" | tac | tac | awk -F'id="' '/resultsbottomBorder/ {split($2,a,"_");print a[1]; exit}' )
+_url=$( curl -sL --http1.1 -d 'updateIDs=[{"size":0,"uidInfo":"'${_id}'","updateID":"'${_id}'"}]' -X POST -L https://www.catalog.update.microsoft.com/DownloadDialog.aspx | awk -F"'" '/url =/ {print $2}' )
+printf '{"distro":"windows","name":"10","version":"%s","build":"%s","kb":"%s","id":"%s","date":"%s","media":"Update","url":"%s"}\n' "${_version}" "${_build}" "${_kb}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# Windows 11
 # _page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information )
 # _build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}'  <<< "${_page}" )
 # _version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
-# curl -sL "https://go.microsoft.com/fwlink?linkid=2156292" -o /tmp/11.cab
-# 7z e /tmp/11.cab -so products.xml > /tmp/11.xml
-# _url=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/FilePath)' )
-# _sha=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/Sha1)' )
-# rm /tmp/11.cab /tmp/11.xml
-# printf '{"distro":"windows","name":"11","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
-# _id=$( curl -sL --http1.1 https://www.catalog.update.microsoft.com/Search.aspx?q=Cumulative%20Windows%2011%20x64%20"${_kb}" | tac | tac | awk -F'id="' '/resultsbottomBorder/ {split($2,a,"_");print a[1]; exit}' )
-# _url=$( curl -sL --http1.1 -d 'updateIDs=[{"size":0,"uidInfo":"'${_id}'","updateID":"'${_id}'"}]' -X POST -L https://www.catalog.update.microsoft.com/DownloadDialog.aspx | awk -F"'" '/url =/ {print $2}' )
-# printf '{"distro":"windows","name":"11","version":"%s","build":"%s","kb":"%s","id":"%s","date":"%s","media":"Update","url":"%s"}\n' "${_version}" "${_build}" "${_kb}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # Nuc Bios
-# unset _bios
-# declare -A _bios
-# _bios[NUC7I3DNKE]="DNKBLI30"
-# _bios[NUC7I5BNK]="BNKBL357"
-# for _i in "${!_bios[@]}" ; do
-#   _version=$( curl -sL "https://www.asus.com/supportonly/${_i,,,}/helpdesk_bios" | awk -F'Version ' '/BIOS Update \['"${_bios[$_i]}"'\]/ && /Version / {print substr($2,1,4)}' )
-#   _url="https://dlcdnets.asus.com/pub/ASUS/NUC/NUC_7_Board/BIOS_Update_${_bios[$_i]}.zip?model=${_i}"
-#   printf '{"distro":"asus","name":"%s","bios":"%s","version":"%s","date":"%s","media":"BIOS","url":"%s"}\n' "${_i}" "${_bios[$_i]}" "${_version:-0}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# done
-# # Proxmox Virtio
-# _version=$( curl -sL "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/latest-build/buildversions.json" | jq -r '."virtio-win-prewhql".version' )
-# _url="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso"
-# printf '{"distro":"proxmox","name":"virtio","version":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # realvnc viewer
-# _version=$( curl -sL https://www.realvnc.com/en/connect/download/viewer/linux | awk -F'-' '/Standalone/ { print $4 }' )
-# _url="https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-${_version}-Linux-x64"
-# printf '{"distro":"realvnc","name":"linux","version":"%s","date":"%s","media":"EXE","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# _version=$( curl -sL https://www.realvnc.com/en/connect/download/viewer/windows | awk -F'-' '/Windows-64bit.exe/ { print $4 }' )
-# _url="https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-${_version}-Windows-64bit.exe"
-# printf '{"distro":"realvnc","name":"windows","version":"%s","date":"%s","media":"EXE","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-# # Local debian apps
-# # eza
-# _app_repo="eza-community"
-# _app_name="eza"
-# _app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
-# _page=$( curl -sL "${_app_url}/releases/latest")
-# _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-# _sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
-# _url_exec=$( jq -r '.assets[] | select(.name | test(".*x86_64.*musl.*tar")) | .browser_download_url' <<< "${_page}" )
-# _url_completions=$( jq -r '.assets[] | select(.name | test(".*completions*")) | .browser_download_url' <<< "${_page}" )
-# printf '{"distro":"deb","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url1":"%s","url2":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_exec}" "${_url_completions}" >> "${_outfile}"
-# printf '{"distro":"opkg","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url1":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_exec}" >> "${_outfile}"
-# # fastfecth
-# _app_repo="fastfetch-cli"
-# _app_name="fastfetch"
-# _app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
-# _page=$( curl -sL "${_app_url}/releases/latest")
-# _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-# _sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
-# _url_deb=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
-# _url_opkg=$( jq -r '.assets[] | select(.name | test(".*musl.*amd64.*tar")) | .browser_download_url' <<< "${_page}" )
-# printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_deb}" >> "${_outfile}"
-# printf '{"distro":"opkg","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_opkg}" >> "${_outfile}"
-# # trash-cli
-# _app_repo="debian"
-# _app_name="trash-cli"
-# _version=$( curl -sL "https://salsa.debian.org/api/v4/projects/${_app_repo}%2F${_app_name}/repository/tags" | jq -r '.[0].name | split( "/" )[1]' )
-# _url="http://ftp.debian.org/debian/pool/main/${_app_name:0:1}/${_app_name}/${_app_name}_${_version}_all.deb"
-# printf '{"distro":"apt","name":"%s","version":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# _id=$( curl -sL --http1.1 "https://api.uupdump.net/listid.php?search=${_build}+amd64" | jq -r '.response.builds[] | select( .title | contains( "Cumulative" ) | not ) | .uuid' )
+# _url="https://uupdump.net/get.php?id=${_id}&pack=en-us&edition=Professional&aria2=2"
+_page=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information )
+_build=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; getline; getline; getline; getline; print $3}'  <<< "${_page}" )
+_version=$( awk '/Servicing channels/{ FS="[><]"; getline; getline; getline; print $3}' <<< "${_page}" )
+curl -sL "https://go.microsoft.com/fwlink?linkid=2156292" -o /tmp/11.cab
+7z e /tmp/11.cab -so products.xml > /tmp/11.xml
+_url=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/FilePath)' )
+_sha=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" and Edition="Professional" and LanguageCode="en-us"]/Sha1)' )
+rm /tmp/11.cab /tmp/11.xml
+printf '{"distro":"windows","name":"11","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
+_id=$( curl -sL --http1.1 https://www.catalog.update.microsoft.com/Search.aspx?q=Cumulative%20Windows%2011%20x64%20"${_kb}" | tac | tac | awk -F'id="' '/resultsbottomBorder/ {split($2,a,"_");print a[1]; exit}' )
+_url=$( curl -sL --http1.1 -d 'updateIDs=[{"size":0,"uidInfo":"'${_id}'","updateID":"'${_id}'"}]' -X POST -L https://www.catalog.update.microsoft.com/DownloadDialog.aspx | awk -F"'" '/url =/ {print $2}' )
+printf '{"distro":"windows","name":"11","version":"%s","build":"%s","kb":"%s","id":"%s","date":"%s","media":"Update","url":"%s"}\n' "${_version}" "${_build}" "${_kb}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# Nuc Bios
+unset _bios
+declare -A _bios
+_bios[NUC7I3DNKE]="DNKBLI30"
+_bios[NUC7I5BNK]="BNKBL357"
+for _i in "${!_bios[@]}" ; do
+  _version=$( curl -sL "https://www.asus.com/supportonly/${_i,,,}/helpdesk_bios" | awk -F'Version ' '/BIOS Update \['"${_bios[$_i]}"'\]/ && /Version / {print substr($2,1,4)}' )
+  _url="https://dlcdnets.asus.com/pub/ASUS/NUC/NUC_7_Board/BIOS_Update_${_bios[$_i]}.zip?model=${_i}"
+  printf '{"distro":"asus","name":"%s","bios":"%s","version":"%s","date":"%s","media":"BIOS","url":"%s"}\n' "${_i}" "${_bios[$_i]}" "${_version:-0}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+done
+# Proxmox Virtio
+_version=$( curl -sL "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/latest-build/buildversions.json" | jq -r '."virtio-win-prewhql".version' )
+_url="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso"
+printf '{"distro":"proxmox","name":"virtio","version":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# realvnc viewer
+_version=$( curl -sL https://www.realvnc.com/en/connect/download/viewer/linux | awk -F'-' '/Standalone/ { print $4 }' )
+_url="https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-${_version}-Linux-x64"
+printf '{"distro":"realvnc","name":"linux","version":"%s","date":"%s","media":"EXE","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_version=$( curl -sL https://www.realvnc.com/en/connect/download/viewer/windows | awk -F'-' '/Windows-64bit.exe/ { print $4 }' )
+_url="https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-${_version}-Windows-64bit.exe"
+printf '{"distro":"realvnc","name":"windows","version":"%s","date":"%s","media":"EXE","url":"%s"}\n' "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+# Local debian apps
+# eza
+_app_repo="eza-community"
+_app_name="eza"
+_app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
+_page=$( curl -sL "${_app_url}/releases/latest")
+_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
+_sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
+_url_exec=$( jq -r '.assets[] | select(.name | test(".*x86_64.*musl.*tar")) | .browser_download_url' <<< "${_page}" )
+_url_completions=$( jq -r '.assets[] | select(.name | test(".*completions*")) | .browser_download_url' <<< "${_page}" )
+printf '{"distro":"deb","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url1":"%s","url2":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_exec}" "${_url_completions}" >> "${_outfile}"
+printf '{"distro":"opkg","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url1":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_exec}" >> "${_outfile}"
+# fastfecth
+_app_repo="fastfetch-cli"
+_app_name="fastfetch"
+_app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
+_page=$( curl -sL "${_app_url}/releases/latest")
+_version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
+_sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
+_url_deb=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
+_url_opkg=$( jq -r '.assets[] | select(.name | test(".*musl.*amd64.*tar")) | .browser_download_url' <<< "${_page}" )
+printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_deb}" >> "${_outfile}"
+printf '{"distro":"opkg","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_opkg}" >> "${_outfile}"
+# trash-cli
+_app_repo="debian"
+_app_name="trash-cli"
+_version=$( curl -sL "https://salsa.debian.org/api/v4/projects/${_app_repo}%2F${_app_name}/repository/tags" | jq -r '.[0].name | split( "/" )[1]' )
+_url="http://ftp.debian.org/debian/pool/main/${_app_name:0:1}/${_app_name}/${_app_name}_${_version}_all.deb"
+printf '{"distro":"apt","name":"%s","version":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 
