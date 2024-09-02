@@ -159,46 +159,78 @@ printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","me
 # _url="${_url}/debian-${_version}-generic-amd64-daily.qcow2"
 # printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Fedora
-_version=$( curl -sL https://github.com/docker-library/official-images/raw/master/library/fedora | awk -F": |, " '/latest/ {print $2}' )
+# _version=$( curl -sL https://github.com/docker-library/official-images/raw/master/library/fedora | awk -F": |, " '/latest/ {print $2}' )
+_version=$( curl -sL "https://fedorapeople.org/groups/qa/metadata/release.json" | jq -r '.fedora.stable.[-1]' )
 _url="https://dl.fedoraproject.org/pub/fedora"
-# _release=$( curl -sL "${_url}/imagelist-fedora" | awk '/Fedora-Workstation-Live-x86_64-'"${_version}"'-.*.iso/' | head -1 )
-_release=$( curl -sL "${_url}/imagelist-fedora" | grep -o -P '(?<=Fedora-Workstation-Live-x86_64-'"${_version}"'-).*?(?=.iso)' | head -1 )
-_sha=$( curl -sL "${_url}/linux/releases/${_version}/Everything/x86_64/iso/Fedora-Everything-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA256/ {print $4}' )
-_url="${_url}/linux/releases/${_version}/Everything/x86_64/os/images/pxeboot"
+# # _release=$( curl -sL "${_url}/imagelist-fedora" | awk '/Fedora-Workstation-Live-x86_64-'"${_version}"'-.*.iso/' | head -1 )
+# _release=$( curl -sL "${_url}/imagelist-fedora" | grep -o -P '(?<=Fedora-Workstation-Live-x86_64-'"${_version}"'-).*?(?=.iso)' | head -1 )
+# _sha=$( curl -sL "${_url}/linux/releases/${_version}/Everything/x86_64/iso/Fedora-Everything-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA256/ {print $4}' )
+# _url="${_url}/linux/releases/${_version}/Everything/x86_64/os/images/pxeboot"
+_page=$( curl -sL "${_url}/imagelist-fedora" )
+_shaurl="${_url}"$( awk -F'[.]|\/Fedora' '/\/'"${_version}"'\// && /x86/ && /Everything/ && /\/iso\// {a=$2} END {print a}' <<< "${_page}" )
+_pagesha=$( curl -sL "${_shaurl}" )
+_shaurl="${_shaurl}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_pagesha}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
+_url="${_url}/"$( awk -F'[.]|\/Fedora|\/boot' '/\/'"${_version}"'\// && /x86/ && /Everything/ && /boot/ {a=$2} END {print a"/pxeboot"}' <<< "${_page}" )
 printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-_url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Workstation/x86_64/iso"
-_sha=$( curl -sL "${_url}/Fedora-Workstation-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
-_url="${_url}/Fedora-Workstation-Live-x86_64-${_version}-${_release}.iso"
+# _url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Workstation/x86_64/iso"
+# _sha=$( curl -sL "${_url}/Fedora-Workstation-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
+# _url="${_url}/Fedora-Workstation-Live-x86_64-${_version}-${_release}.iso"
+_url="https://dl.fedoraproject.org/pub/fedora"
+_page=$( curl -sL "${_url}/imagelist-fedora" )
+_url="${_url}/"$( awk -F'[.]|\/Fedora' '/\/'"${_version}"'\// && /x86/ && /Workstation/ && !/osb/ {a=$2} END {print a}' <<< "${_page}" )
+_page=$( curl -sL "${_url}" )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ && !/osb/ {print $4}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/Live/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
 printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-_url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Cloud/x86_64/images"
-_sha=$( curl -sL "${_url}/Fedora-Cloud-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
-_url="${_url}/Fedora-Cloud-Base-Generic.x86_64-${_version}-${_release}.qcow2"
+# _url="https://dl.fedoraproject.org/pub/fedora/linux/releases/${_version}/Cloud/x86_64/images"
+# _sha=$( curl -sL "${_url}/Fedora-Cloud-${_version}-${_release}-x86_64-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
+# _url="${_url}/Fedora-Cloud-Base-Generic.x86_64-${_version}-${_release}.qcow2"
+_url="https://dl.fedoraproject.org/pub/fedora"
+_page=$( curl -sL "${_url}/imagelist-fedora" )
+_url="${_url}/"$( awk -F'[.]|\/Fedora' '/\/'"${_version}"'\// && /x86/ && /Cloud/ && /Generic/ {a=$2} END {print a}' <<< "${_page}" )
+_page=$( curl -sL "${_url}" )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ && /Generic/ {print $4}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]qcow2' '/Generic/ {a=$2} END {print "Fedora-"a".qcow2"}' <<< "${_page}" )
 printf '{"distro":"fedora","name":"fedora","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Rawhide
-_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64"
-_versionplus=$( curl -sL "${_url}/iso" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
-_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-_sha=$( curl -sL "${_url}/iso/Fedora-Everything-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4}' )
-_url="${_url}/os/images/pxeboot"
-printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Workstation/x86_64/iso"
-_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
-_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-_sha=$( curl -sL "${_url}/Fedora-Workstation-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
-_url="${_url}/Fedora-Workstation-Live-x86_64-Rawhide-${_versionplus}.iso"
-printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-#_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
-#_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' | head -1 )
-#_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
-#_sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
-#_url="${_url}/Fedora-Cloud-Base-Generic.x86_64-Rawhide-${_versionplus}.qcow2"
-_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
+_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/iso"
+# _versionplus=$( curl -sL "${_url}/iso" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
+# _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+# _sha=$( curl -sL "${_url}/iso/Fedora-Everything-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4}' )
+# _url="${_url}/os/images/pxeboot"
 _page=$( curl -sL "${_url}" )
 _versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
 _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
 _shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
 _sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
-_url="${_url}/"$( awk -F 'Fedora-|.qcow2' '/Generic/ {a=$2} END {print "Fedora-"a".qcow2"}' <<< "${_page}" )
+_url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/netinst/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
+printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Workstation/x86_64/iso"
+# _versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
+# _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+# _sha=$( curl -sL "${_url}/Fedora-Workstation-iso-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA/ {print $4; exit}' )
+# _url="${_url}/Fedora-Workstation-Live-x86_64-Rawhide-${_versionplus}.iso"
+_page=$( curl -sL "${_url}" )
+_versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
+_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]iso' '/Live/ {a=$2} END {print "Fedora-"a".iso"}' <<< "${_page}" )
+printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Cloud/x86_64/images"
+#_versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' | head -1 )
+#_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+#_sha=$( curl -sL "${_url}/Fedora-Cloud-images-Rawhide-x86_64-${_versionplus}-CHECKSUM" | awk '/^SHA256/ {print $4; exit}' )
+#_url="${_url}/Fedora-Cloud-Base-Generic.x86_64-Rawhide-${_versionplus}.qcow2"
+_page=$( curl -sL "${_url}" )
+_versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<< "${_page}" | head -1 )
+_version=$( awk -F '.' '{print $1}' <<< $_versionplus )
+_shaurl="${_url}/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
+_sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
+_url="${_url}/"$( awk -F 'Fedora-|[.]qcow2' '/Generic/ {a=$2} END {print "Fedora-"a".qcow2"}' <<< "${_page}" )
 printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Flatcar
 _url="http://stable.release.flatcar-linux.net/amd64-usr/current"
