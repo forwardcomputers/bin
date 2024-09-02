@@ -171,7 +171,7 @@ printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","me
 # printf '{"distro":"debian","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Fedora
 # _version=$( curl -sL https://github.com/docker-library/official-images/raw/master/library/fedora | awk -F": |, " '/latest/ {print $2}' )
-_version=$( curl -sL "https://fedorapeople.org/groups/qa/metadata/release.json" | jq -r '.fedora.stable.[-1]' )
+_version=$( curl -sL "https://fedorapeople.org/groups/qa/metadata/release.json" | jq -r ".fedora.stable.[-1]" )
 _url="https://dl.fedoraproject.org/pub/fedora"
 # # _release=$( curl -sL "${_url}/imagelist-fedora" | awk '/Fedora-Workstation-Live-x86_64-'"${_version}"'-.*.iso/' | head -1 )
 # _release=$( curl -sL "${_url}/imagelist-fedora" | grep -o -P '(?<=Fedora-Workstation-Live-x86_64-'"${_version}"'-).*?(?=.iso)' | head -1 )
