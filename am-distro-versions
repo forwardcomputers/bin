@@ -217,7 +217,7 @@ _versionplus=$( awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print a}' <<<
 _version=$( awk -F '.' '{print $1}' <<< $_versionplus )
 _shaurl="${_url}/iso/"$( awk -F 'Fedora-|-CHECKSUM' '/CHECKSUM/ {a=$2} END {print "Fedora-"a"-CHECKSUM"}' <<< "${_page}" )
 _sha=$( curl -sL "${_shaurl}" | awk '/^SHA256/ {print $4; exit}' )
-_url="${_url}/os/images/pxeboot/"
+_url="${_url}/os/images/pxeboot"
 printf '{"distro":"fedora","name":"rawhide","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _url="https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Workstation/x86_64/iso"
 # _versionplus=$( curl -sL "${_url}" | awk -F 'x86_64-|-CHECKSUM' '/CHECKSUM/ {print $2}' | head -1 )
