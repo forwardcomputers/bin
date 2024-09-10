@@ -331,7 +331,7 @@ _sha=$( xmllint /tmp/11.xml --nonet --xpath 'string(//File[Architecture="x64" an
 rm /tmp/11.cab /tmp/11.xml
 printf '{"distro":"windows","name":"11","version":"%s","build":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_build}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # _kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information | tac | tac | awk -v FPAT='KB[0-9]+' 'NF{ print $1; exit }' )
-_kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information | tac | tac | awk -F'[><]' '/data-linktype="external">KB[0-9].+td/ { print $5; exit }' )
+_kb=$( curl -sL --http1.1 https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information | tac | tac | awk -F'[><]' '/id="windows-11-release-history"/{_p=1} /KB[0-9]/&&_p { print $5; exit }' )
 _id=$( curl -sL --http1.1 https://www.catalog.update.microsoft.com/Search.aspx?q=Cumulative%20Windows%2011%20x64%20"${_kb}" | tac | tac | awk -F'id="' '/resultsbottomBorder/ {split($2,a,"_");print a[1]; exit}' )
 _url=$( curl -sL --http1.1 -d 'updateIDs=[{"size":0,"uidInfo":"'${_id}'","updateID":"'${_id}'"}]' -X POST -L https://www.catalog.update.microsoft.com/DownloadDialog.aspx | awk -F"'" '/url =/ {print $2}' )
 printf '{"distro":"windows","name":"11","version":"%s","build":"%s","kb":"%s","id":"%s","date":"%s","media":"Update","url":"%s"}\n' "${_version}" "${_build}" "${_kb}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
