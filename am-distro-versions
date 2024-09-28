@@ -61,7 +61,7 @@ _url="https://downloads.sourceforge.net/clonezilla/$( awk '/amd64.zip/ {print $2
 printf '{"distro":"clonezilla","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # krd
 set -x
-#curl -I http://rescuedisk.s.kaspersky-labs.com
+curl -I http://rescuedisk.s.kaspersky-labs.com
 #curl -sL http://rescuedisk.s.kaspersky-labs.com/updatable/2018/bases/krd.xml
 _sha=$( curl -sL http://rescuedisk.s.kaspersky-labs.com/updatable/2018/bases/krd.xml | awk -F'"' '/databases_timestamp/ {print $2}' )
 _version="${_sha:0:8}"
