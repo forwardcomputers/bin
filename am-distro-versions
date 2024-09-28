@@ -60,7 +60,7 @@ _sha=$( awk '/amd64.zip/ {print $1; exit}' <<< "${_page}" )
 _url="https://downloads.sourceforge.net/clonezilla/$( awk '/amd64.zip/ {print $2; exit}' <<< ${_page} )"
 printf '{"distro":"clonezilla","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # krd
-_sha=$( -sL http://rescuedisk.s.kaspersky-labs.com/updatable/2018/bases/krd.xml | awk -F'"' '/databases_timestamp/ {print $2}' )
+_sha=$( curl -sL http://rescuedisk.s.kaspersky-labs.com/updatable/2018/bases/krd.xml | awk -F'"' '/databases_timestamp/ {print $2}' )
 _version="${_sha:0:8}"
 _url="https://rescuedisk.s.kaspersky-labs.com/updatable/2018/krd.iso"
 printf '{"distro":"krd","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
