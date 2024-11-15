@@ -138,7 +138,7 @@ _page=$( curl -sL "${_url}/debian-cd/current-live/amd64/iso-hybrid/SHA256SUMS" )
 _sha=$( awk '/amd64-gnome.iso/ {print $1; exit}' <<< "${_page}" )
 printf '{"distro":"debian","release":"stable","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}/debian/dists/${_name}/main/installer-amd64/current/images/netboot/debian-installer/amd64" >> "${_outfile}"
 _filename=$( awk '/amd64-gnome.iso/ {print $2; exit}' <<< "${_page}" )
-printf '{"distro":"debian","release":"stable","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}-cd/current-live/amd64/iso-hybrid/${_filename}" >> "${_outfile}"
+printf '{"distro":"debian","release":"stable","name":"%s","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}/debian-cd/current-live/amd64/iso-hybrid/${_filename}" >> "${_outfile}"
 # _url="https://cdimage.debian.org/mirror/cdimage/cloud"
 _url="${_url}/cdimage/cloud/${_name}/latest"
 _version=$( awk -F. '{print $1}' <<< "${_version}" )
