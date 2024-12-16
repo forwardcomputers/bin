@@ -1,0 +1,55 @@
+#!/bin/bash
+#
+declare -A _name _desc _icon
+_name[AghaniAghani]="Aghani Aghani"
+_desc[AghaniAghani]="Selection of the latest Arabic music."
+_icon[AghaniAghani]="https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/images/tv/aghaniaghani.png"
+_name[ArabicaTV]="Arabica TV"
+_desc[ArabicaTV]="Selection of the latest Arabic music."
+_icon[ArabicaTV]="https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/images/tv/arabicatv.png"
+_name[Wanasah]="Wanasah"
+_desc[Wanasah]="Selection of the latest Arabic music."
+_icon[Wanasah]="https://github.com/tv-logo/tv-logos/raw/main/countries/united-arab-emirates/wanasah-ae.png"
+_name[CityNewsToronto]="CityNews 24/7 Toronto"
+_desc[CityNewsToronto]="Latest Toronto news."
+_icon[CityNewsToronto]="https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/images/tv/citynews247.png"
+_name[GlobalNews]="Global News"
+_desc[GlobalNews]="Latest Canada news."
+_icon[GlobalNews]="https://github.com/forwardcomputers/forwardcomputers.github.io/raw/main/images/tv/citynews247.png"
+
+_pathName="./"
+_fileName="local.xml"
+_fullName="${_pathName}${_fileName}"
+cat > "${_fullName}" <<-_EOF
+	<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE tv SYSTEM "xmltv.dtd">
+	<tv generator-info-name="local">
+_EOF
+
+for i in "${!_name[@]}" ; do
+	cat >> "${_fullName}" <<-_EOF
+		  <channel id="${i}">
+		    <display-name>${_name[$i]}</display-name>
+		    <icon src="${_icon[$i]}" />
+		  </channel>
+	_EOF
+
+	for j in {0..6}; do
+		for k in {0..23}; do
+			_startTime=$( date -d "$k:00 today +$j days" +"%Y%m%d%H%M%S +0000")
+			_endTime=$( date -d "$k:00 today +$j days 60 minutes" +"%Y%m%d%H%M%S +0000")
+			cat >> "${_fullName}" <<-_EOF
+			  <programme channel="${i}" start="${_startTime}" stop="${_endTime}">
+			    <title>${_name[$i]}</title>
+			    <desc>${_desc[$i]}</desc>
+			  </programme>
+			  <rating>
+			    <value>TV-G</value>
+			  </rating>
+			_EOF
+		done
+	done
+done
+
+printf '</tv>\n' >> "${_fullName}"
+
+
