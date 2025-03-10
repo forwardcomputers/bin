@@ -75,7 +75,7 @@ printf '{"distro":"systemrescue","name":"","version":"%s","sha":"%s","date":"%s"
 # shredos
 _page=$( curl -sL https://api.github.com/repos/PartialVolume/shredos.x86_64/releases/latest )
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-_url=$( jq -r '.assets[] | select( ( .content_type | contains( "iso" ) ) and ( .name | contains( "i586" ) | not ) and ( .name | contains( "nomodeset" ) | not ) ).browser_download_url' <<< $_page )
+_url=$( jq -r '.assets[] | select( ( .content_type | contains( "img" ) ) and ( .name | contains( "i586" ) | not ) and ( .name | contains( "nomodeset" ) | not ) ).browser_download_url' <<< $_page )
 printf '{"distro":"shredos","name":"","version":"%s","sha":"","date":"","media":"Netboot","url":"%s"}\n' "${_version}" "${_url}" >> "${_outfile}"
 # openwrt
 _version=$( curl -sL https://api.github.com/repos/openwrt/openwrt/releases/latest | jq -r '.tag_name | gsub("v";"")' )
