@@ -2,6 +2,8 @@
 #
 set -eEx
 #
+_GH_TOKEN=$1
+#
 # A function to handle errors and display an error message with job name, line of error occurrence, and error code.
 error () {
 		JOB="$0"              # job name
@@ -17,26 +19,26 @@ _dateLocal=$( jq -r 'fromdate | strflocaltime("%F %T %p")' <<< '"'${_dateISO}'"'
 _outfile="distros.json"
 echo -n > "${_outfile}"
 # oh-my-bash
-_sha=$( curl -sL https://api.github.com/repos/ohmybash/oh-my-bash/commits/master | jq -r '.sha' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/ohmybash/oh-my-bash/commits/master | jq -r '.sha' )
 _url="https://github.com/ohmybash/oh-my-bash.git"
 printf '{"distro":"oh-my-bash","name":"","version":"","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # oh-my-zsh
-_sha=$( curl -sL https://api.github.com/repos/ohmyzsh/ohmyzsh/commits/master | jq -r '.sha' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/ohmyzsh/ohmyzsh/commits/master | jq -r '.sha' )
 _url="https://github.com/ohmyzsh/ohmyzsh.git"
 printf '{"distro":"oh-my-zsh","name":"","version":"","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # oh-my-posh
-_version=$( curl -sL https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/releases/latest | jq -r '.tag_name | gsub("v";"")' )
-_sha=$( curl -sL https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/commits/main | jq -r '.sha' )
+_version=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/releases/latest | jq -r '.tag_name | gsub("v";"")' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/commits/main | jq -r '.sha' )
 _url="https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/v${_version}/{posh-darwin-arm64,posh-linux-amd64,posh-linux-arm64,posh-windows-amd64.exe,themes.zip}"
 printf '{"distro":"oh-my-posh","name":"","version":"%s","sha":"%s","date":"%s","media":"Executable","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # wimboot
-_version=$( curl -sL https://api.github.com/repos/ipxe/wimboot/releases/latest | jq -r '.tag_name | gsub("v";"")' )
-_sha=$( curl -sL https://api.github.com/repos/ipxe/wimboot/commits/master | jq -r '.sha' )
+_version=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/ipxe/wimboot/releases/latest | jq -r '.tag_name | gsub("v";"")' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/ipxe/wimboot/commits/master | jq -r '.sha' )
 _url="https://github.com/ipxe/wimboot/raw/master/wimboot"
 printf '{"distro":"ipxe","name":"wimboot","version":"%s","sha":"%s","date":"%s","media":"Executable","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # ipxe
-_version=$( curl -sL https://api.github.com/repos/ipxe/ipxe/tags | jq -r '.[0].name | gsub("v";"")' )
-_sha=$( curl -sL https://api.github.com/repos/ipxe/ipxe/commits/master | jq -r '.sha' )
+_version=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/ipxe/ipxe/tags | jq -r '.[0].name | gsub("v";"")' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/ipxe/ipxe/commits/master | jq -r '.sha' )
 _url="https://github.com/ipxe/ipxe.git"
 printf '{"distro":"ipxe","name":"ipxe","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # buildroot
@@ -73,25 +75,25 @@ _sha=$( curl -sL "https://www.system-rescue.org/releases/${_version}/systemrescu
 _url=$( curl -sL https://www.system-rescue.org/Download | awk -F'"' '/amd64.iso\/download/ {print $4}' )
 printf '{"distro":"systemrescue","name":"","version":"%s","sha":"%s","date":"%s","media":"ISO","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # shredos
-_page=$( curl -sL https://api.github.com/repos/PartialVolume/shredos.x86_64/releases/latest )
+_page=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/PartialVolume/shredos.x86_64/releases/latest )
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
 _url=$( jq -r '.assets[] | select( ( .content_type | contains( "img" ) ) and ( .name | contains( "i586" ) | not ) and ( .name | contains( "nomodeset" ) | not ) ).browser_download_url' <<< $_page )
 printf '{"distro":"shredos","name":"","version":"%s","sha":"","date":"","media":"Netboot","url":"%s"}\n' "${_version}" "${_url}" >> "${_outfile}"
 # openwrt
-_version=$( curl -sL https://api.github.com/repos/openwrt/openwrt/releases/latest | jq -r '.tag_name | gsub("v";"")' )
+_version=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/openwrt/openwrt/releases/latest | jq -r '.tag_name | gsub("v";"")' )
 _sha=$( curl -sL "https://downloads.openwrt.org/releases/${_version}/targets/x86/64/sha256sums" | awk '/openwrt-'${_version}'-x86-64-generic-ext4-combined.img.gz/ {print $1}')
 _url="https://downloads.openwrt.org/releases/${_version}/targets/x86/64/openwrt-${_version}-x86-64-generic-ext4-combined-efi.img.gz"
 printf '{"distro":"openwrt","name":"","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # RPi3 UEFI
-_page=$( curl -sL https://api.github.com/repos/pftf/RPi3/releases/latest )
+_page=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/pftf/RPi3/releases/latest )
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-_sha=$( curl -sL https://api.github.com/repos/pftf/RPi3/commits/master | jq -r '.sha' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/pftf/RPi3/commits/master | jq -r '.sha' )
 _url=$( jq -r '.assets[].browser_download_url' <<< "${_page}" )
 printf '{"distro":"RPiUEFI","name":"3","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # RPi4 UEFI
-_page=$( curl -sL https://api.github.com/repos/pftf/RPi4/releases/latest )
+_page=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/pftf/RPi4/releases/latest )
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-_sha=$( curl -sL https://api.github.com/repos/pftf/RPi4/commits/master | jq -r '.sha' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/repos/pftf/RPi4/commits/master | jq -r '.sha' )
 _url=$( jq -r '.assets[].browser_download_url' <<< "${_page}" )
 printf '{"distro":"RPiUEFI","name":"4","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # RPi OS
@@ -362,9 +364,9 @@ printf '{"distro":"realvnc","name":"windows","version":"%s","date":"%s","media":
 _app_repo="eza-community"
 _app_name="eza"
 _app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
-_page=$( curl -sL "${_app_url}/releases/latest")
+_page=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL "${_app_url}/releases/latest")
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-_sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL "${_app_url}/commits/master" | jq -r '.sha' )
 _url_exec=$( jq -r '.assets[] | select(.name | test(".*x86_64.*musl.*tar")) | .browser_download_url' <<< "${_page}" )
 _url_completions=$( jq -r '.assets[] | select(.name | test(".*completions*")) | .browser_download_url' <<< "${_page}" )
 printf '{"distro":"deb","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url1":"%s","url2":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_exec}" "${_url_completions}" >> "${_outfile}"
@@ -373,9 +375,9 @@ printf '{"distro":"opkg","name":"%s","version":"%s","sha":"%s","date":"%s","arch
 _app_repo="fastfetch-cli"
 _app_name="fastfetch"
 _app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
-_page=$( curl -sL "${_app_url}/releases/latest")
+_page=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL "${_app_url}/releases/latest")
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
-_sha=$( curl -sL "${_app_url}/commits/master" | jq -r '.sha' )
+_sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL "${_app_url}/commits/master" | jq -r '.sha' )
 _url_deb=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
 _url_opkg=$( jq -r '.assets[] | select(.name | test(".*musl.*amd64.*tar")) | .browser_download_url' <<< "${_page}" )
 printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_deb}" >> "${_outfile}"
