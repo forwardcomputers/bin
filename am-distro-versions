@@ -339,15 +339,16 @@ _id=$( curl -sL --http1.1 https://www.catalog.update.microsoft.com/Search.aspx?q
 _url=$( curl -sL --http1.1 -d 'updateIDs=[{"size":0,"uidInfo":"'${_id}'","updateID":"'${_id}'"}]' -X POST -L https://www.catalog.update.microsoft.com/DownloadDialog.aspx | tac | tac | awk -F"'" '/url =/ {print $2; exit}' )
 printf '{"distro":"windows","name":"11","version":"%s","build":"%s","kb":"%s","id":"%s","date":"%s","media":"Update","url":"%s"}\n' "${_version}" "${_build}" "${_kb}" "${_id}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Nuc Bios
-unset _bios
-declare -A _bios
-_bios[NUC7I3DNKE]="DNKBLI30"
-_bios[NUC7I5BNK]="BNKBL357"
-for _i in "${!_bios[@]}" ; do
-  _version=$( curl -sL "https://www.asus.com/supportonly/${_i,,,}/helpdesk_bios" | awk -F'Version ' '/BIOS Update \['"${_bios[$_i]}"'\]/ && /Version / {print substr($2,1,4)}' )
-  _url="https://dlcdnets.asus.com/pub/ASUS/NUC/NUC_7_Board/BIOS_Update_${_bios[$_i]}.zip?model=${_i}"
-  printf '{"distro":"asus","name":"%s","bios":"%s","version":"%s","date":"%s","media":"BIOS","url":"%s"}\n' "${_i}" "${_bios[$_i]}" "${_version:-0}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-done
+_model="NUC7I3DNK"
+_bios="DNKBLi30"
+_version=$( curl -sL "https://www.asus.com/supportonly/${_model}/helpdesk_bios" | awk -F'Version ' '/BIOS Update / && /Version / {print substr($2,1,4); exit}' )
+_url="https://dlcdnets.asus.com/pub/ASUS/NUC/Intel_NUC_Kit/${_bios}.86A.${_version}.zip?model=${_model}"
+printf '{"distro":"asus","name":"%s","bios":"%s","version":"%s","date":"%s","media":"BIOS","url":"%s"}\n' "${_model}" "${_bios^^}" "${_version:-0}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+_model="NUC7I5BNK"
+_bios="BNKBL357"
+_version=$( curl -sL "https://www.asus.com/supportonly/${_model}/helpdesk_bios" | awk -F'Version ' '/BIOS Update / && /Version / {print substr($2,1,4); exit}' )
+_url="https://dlcdnets.asus.com/pub/ASUS/NUC/NUC_7_Board/BIOS_Update_${_bios}.zip?model=${_model}"
+printf '{"distro":"asus","name":"%s","bios":"%s","version":"%s","date":"%s","media":"BIOS","url":"%s"}\n' "${_model}" "${_bios}" "${_version:-0}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Proxmox Virtio
 _version=$( curl -sL "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/virtio-win-pkg-scripts-input/latest-build/buildversions.json" | jq -r '."virtio-win-prewhql".version' )
 _url="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso"
