@@ -42,9 +42,10 @@ _sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL https://api.github.com/
 _url="https://github.com/ipxe/ipxe.git"
 printf '{"distro":"ipxe","name":"ipxe","version":"%s","sha":"%s","date":"%s","media":"Git","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # buildroot
-_page=$( curl -sL "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" )
+# _page=$( curl -sL "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags" )
 # _version=$( jq -r '.[1].name | gsub("v";"")' <<< "${_page}" )
-_version=$( curl -sL "https://gitlab.com/buildroot.org/buildroot/-/raw/master/docs/website/download.html" | awk -F'>|<' '/long term support release/ { print $5 }' )
+# _version=$( curl -sL "https://gitlab.com/buildroot.org/buildroot/-/raw/master/docs/website/download.html" | awk -F'>|<' '/long term support release/ { print $5 }' )
+_version=$( curl -sL "https://gitlab.com/api/v4/projects/buildroot.org%2Fbuildroot/repository/tags"  | jq -r '.[0].name' )
 # _sha=$( jq -r '.[1].target' <<< "${_page}" )
 _url="https://buildroot.org/downloads/buildroot-${_version}.tar.gz"
 _sha=$( curl -sL "${_url}.sign" | awk '/SHA1:/ {print $2}' )
