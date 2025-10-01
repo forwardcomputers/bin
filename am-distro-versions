@@ -379,7 +379,7 @@ _app_url="https://api.github.com/repos/${_app_repo}/${_app_name}"
 _page=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL "${_app_url}/releases/latest")
 _version=$( jq -r '.tag_name | gsub("v";"")' <<< "${_page}" )
 _sha=$( curl -H "Authorization: Bearer ${_GH_TOKEN}" -sL "${_app_url}/commits/master" | jq -r '.sha' )
-_url_deb=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb")) | .browser_download_url' <<< "${_page}" )
+_url_deb=$( jq -r '.assets[] | select(.name | test(".*linux.*amd64.*deb") and (test("polyfilled") | not )) | .browser_download_url' <<< "${_page}" )
 _url_opkg=$( jq -r '.assets[] | select(.name | test(".*musl.*amd64.*tar")) | .browser_download_url' <<< "${_page}" )
 printf '{"distro":"apt","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_deb}" >> "${_outfile}"
 printf '{"distro":"opkg","name":"%s","version":"%s","sha":"%s","date":"%s","arch":"amd64","url":"%s"}\n' "${_app_name}" "${_version}" "${_sha}" "${_dateLocal}" "${_url_opkg}" >> "${_outfile}"
