@@ -253,20 +253,20 @@ _sha=$( curl -sL "${_url}/flatcar_production_pxe.vmlinuz.DIGESTS" | awk '/flatca
 _url="${_url}"
 printf '{"distro":"flatcar","name":"","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # OpenSUSE
-_url="https://download.opensuse.org/distribution"
-_version=$( curl -sL "${_url}/openSUSE-current/repo/oss/media.1/media" | awk -F'-' '/Media/ { print $4 }' )
-_url="https://download.opensuse.org/distribution/leap/${_version}"
-_page=$( curl -sL "${_url}/live/openSUSE-Leap-${_version}-KDE-Live-x86_64-Media.iso.sha256" )
-_sha=$( awk '{print $1}' <<< "${_page}" )
-_filename=$( awk '{print $2}' <<< "${_page}" )
-_url="${_url}/live/${_filename}"
-printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
-_url="https://download.opensuse.org/distribution/leap/${_version}"
-_page=$( curl -sL "${_url}/appliances/openSUSE-Leap-${_version}-Minimal-VM.x86_64-Cloud.qcow2.sha256")
-_sha=$( awk '{print $1}' <<< "${_page}" )
-_filename=$( awk '{print $2}' <<< "${_page}" )
-_url="${_url}/appliances/${_filename}"
-printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+#_url="https://download.opensuse.org/distribution"
+#_version=$( curl -sL "${_url}/openSUSE-current/repo/oss/media.1/products" | awk '{sub(/-.*/,"",$3); print $3}' )
+#_url="https://download.opensuse.org/distribution/leap/${_version}"
+#_page=$( curl -sL "${_url}/live/openSUSE-Leap-${_version}-KDE-Live-x86_64-Media.iso.sha256" )
+#_sha=$( awk '{print $1}' <<< "${_page}" )
+#_filename=$( awk '{print $2}' <<< "${_page}" )
+#_url="${_url}/live/${_filename}"
+#printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Workstation","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+#_url="https://download.opensuse.org/distribution/leap/${_version}"
+#_page=$( curl -sL "${_url}/appliances/openSUSE-Leap-${_version}-Minimal-VM.x86_64-Cloud.qcow2.sha256")
+#_sha=$( awk '{print $1}' <<< "${_page}" )
+#_filename=$( awk '{print $2}' <<< "${_page}" )
+#_url="${_url}/appliances/${_filename}"
+#printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Cloud","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _url="https://download.opensuse.org/tumbleweed/iso"
 _page=$( curl -sL "${_url}/openSUSE-Tumbleweed-KDE-Live-x86_64-Current.iso.sha256" )
 # _version=$( grep -o -P '(?<=Snapshot).*?(?=-)' <<< "${_page}" )
