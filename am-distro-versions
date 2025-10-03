@@ -254,6 +254,13 @@ _sha=$( curl -sL "${_url}/flatcar_production_pxe.vmlinuz.DIGESTS" | awk '/flatca
 _url="${_url}"
 printf '{"distro":"flatcar","name":"","version":"%s","sha":"%s","date":"%s","media":"Netboot","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # OpenSUSE
+_version=$( curl -sL "https://get.opensuse.org/api/v0/distributions.json" | jq -r '.Leap[0].version' )
+_url="https://download.opensuse.org/distribution/leap/${_version}"
+_page=$( curl -sL "${_url}/offline/Leap-${_version}-offline-installer-x86_64.install.iso.sha256" )
+_sha=$( awk '{print $1}' <<< "${_page}" )
+_filename=$( awk '{print $2}' <<< "${_page}" )
+_url="${_url}/offline/${_filename}"
+printf '{"distro":"opensuse","name":"leap","version":"%s","sha":"%s","date":"%s","media":"Offline","url":"%s"}\n' "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 #_url="https://download.opensuse.org/distribution"
 #_version=$( curl -sL "${_url}/openSUSE-current/repo/oss/media.1/products" | awk '{sub(/-.*/,"",$3); print $3}' )
 #_url="https://download.opensuse.org/distribution/leap/${_version}"
