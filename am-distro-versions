@@ -111,12 +111,12 @@ _sha=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry P
 _kernel=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS Lite" ).kernelVersion' <<< "${_page}" )
 _version=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS Lite" ) | .debianVersion + " - " + .version' <<< "${_page}" )
 _url=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS Lite" ).urlHttp' <<< "${_page}" )
-printf '{"distro":"rpios","name":"%s","kernel":"%s","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_media}" "${_kernel}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+printf '{"distro":"rpios","name":"Lite","kernel":"%s","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_kernel}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 _sha=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS" ).sha256' <<< "${_page}" )
 _kernel=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS" ).kernelVersion' <<< "${_page}" )
 _version=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS" ) | .debianVersion + " - " + .version' <<< "${_page}" )
 _url=$( jq -r '.[].images[] | select( .system=="64-bit" and .title=="Raspberry Pi OS" ).urlHttp' <<< "${_page}" )
-printf '{"distro":"rpios","name":"%s","kernel":"%s","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_media}" "${_kernel}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
+printf '{"distro":"rpios","name":"Desktop","kernel":"%s","version":"%s","sha":"%s","date":"%s","media":"Compressed","url":"%s"}\n' "${_kernel}" "${_version}" "${_sha}" "${_dateLocal}" "${_url}" >> "${_outfile}"
 # Alpine
 _page=$( curl -sL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/latest-releases.yaml )
 _alpine_index=$( yq eval '.[].title | select(. == "Netboot") | path | .[0]' <<< "${_page}" )
